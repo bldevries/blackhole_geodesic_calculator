@@ -1,1 +1,1 @@
-# CurvedPy: General Relativistic Rat Tracer for Python
+# CurvedPy: General Relativistic Ray Tracer for Python
