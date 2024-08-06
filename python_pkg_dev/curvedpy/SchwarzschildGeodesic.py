@@ -7,10 +7,10 @@ import time
 class SchwarzschildGeodesic:
     
 
-    def __init__(self, time_like = False, r_s_value = 1):
+    def __init__(self):
 
-        self.r_s_value = r_s_value
-        self.time_like = time_like
+        self.r_s_value = 1 # We keep the Schwarzschild radius at one and scale appropriately
+        self.time_like = False # No Massive particle geodesics yet
 
         # Define symbolic variables
         self.t, self.x, self.y, self.z, self.r_s = sp.symbols('t x y z r_s')
@@ -18,7 +18,7 @@ class SchwarzschildGeodesic:
         # Radial distance to BlackHole location
         self.R = sp.sqrt(self.x**2 + self.y**2 + self.z**2)
         
-        # The metric
+        # The Schwarzschild metric
         self.g = sp.Matrix([\
             [-(1-self.r_s/(4*self.R))**2 / (1+self.r_s/(4*self.R))**2, 0, 0, 0],\
             [0, (1+self.r_s/(4*self.R))**4, 0, 0], \
@@ -50,12 +50,12 @@ class SchwarzschildGeodesic:
                         self.g[2,2]*self.k_y**2 + self.g[3,3]*self.k_z**2
         
         # Now we calculate k_t using the norm. This eliminates one of the differential equations.
-        # time_like = True: calculates a geodesic for a massive particle
+        # time_like = True: calculates a geodesic for a massive particle (not implemented yet)
         # time_like = False: calculates a geodesic for a photon
         if (self.time_like):
-            self.k_t_from_norm = sp.solve(self.norm_k+1, self.k_t)[1]#.simplify()
+            self.k_t_from_norm = sp.solve(self.norm_k+1, self.k_t)[1]
         else:
-            self.k_t_from_norm = sp.solve(self.norm_k, self.k_t)[1]#.simplify()
+            self.k_t_from_norm = sp.solve(self.norm_k, self.k_t)[1]
 
         # Lambdify versions
         self.dk_x_lamb = sp.lambdify([self.k_x, self.x, self.k_y, self.y, self.k_z, self.z, \
@@ -85,6 +85,7 @@ class SchwarzschildGeodesic:
         return g_sigma_mu_nu
 
 
+    # This function does the numerical integration of the geodesic equation using scipy's solve_ivp
     def calc_trajectory(self, \
                         k_x_0 = 1., k_y_0 = 0., k_z_0 = 0., \
                         x0 = -10.0, y0 = 5.0, z0 = 5.0, \
@@ -135,6 +136,8 @@ class SchwarzschildGeodesic:
         return result
 
 
+    # This function is used by Blender. It scales/adepts the coordinate systems for the calc_trajectory function
+    # and scales and slices the results before giving it back to for example Blender
     def ray_trace(  self, direction, loc_hit, \
                     ratio_obj_to_blackhole = 20, \
                     exit_tolerance = 0.1, \
