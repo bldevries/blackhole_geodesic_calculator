@@ -5,4 +5,5 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 from .SchwarzschildGeodesic import SchwarzschildGeodesic
+from .SchwarzschildGeodesic import ApproxSchwarzschildGeodesic
 

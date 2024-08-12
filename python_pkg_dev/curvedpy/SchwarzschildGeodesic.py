@@ -5,8 +5,6 @@ from scipy.integrate import solve_ivp
 import time
 
 class SchwarzschildGeodesic:
-    
-
     def __init__(self):
 
         self.r_s_value = 1 # We keep the Schwarzschild radius at one and scale appropriately
@@ -161,7 +159,7 @@ class SchwarzschildGeodesic:
         scale_factor = 1/R_schwarz # Everything gets scaled by this factor to have Schwarzschild radius of 1
 
         loc_hit = loc_hit * scale_factor
-        R_sphere_scaled = R_sphere * scale_factor
+        R_sphere_scaled = R_sphere * scale_factor # WHat is this for?????
         
         # Here I scale curve_end because otherwise, with a large R_influence, 
         # the integrator does not reach the otherside of the sphere
@@ -194,7 +192,7 @@ class SchwarzschildGeodesic:
         if verbose: print("Start after cut: ", x[0], y[0], z[0])
 
         if len(list_i) == 0 or res["hit_blackhole"]:
-            return x, y, z, [], []
+            return x, y, z, [], [], {"message": ""}
         else:
             x = x[list_i]
             y = y[list_i]
@@ -209,4 +207,143 @@ class SchwarzschildGeodesic:
             end_loc = np.array([x[-1], y[-1], z[-1]])
 
             if verbose: print("Start after cut and rescaling: ", x[0], y[0], z[0])
-            return x, y, z, end_loc, end_dir
+            return x, y, z, end_loc, end_dir, {"message": ""}
+
+
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+class ApproxSchwarzschildGeodesic:
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    def __init__(self, ratio_obj_to_blackhole = 20):
+        print("")
+        self.ratio_obj_to_blackhole = ratio_obj_to_blackhole
+        SW = SchwarzschildGeodesic()
+        self.data = {str(ratio_obj_to_blackhole): self.makeDataForRayTracer(SW, ratio_obj_to_blackhole)}
+
+
+    # Get the impact parameter and vector
+    def getImpactParam(self, loc_hit, dir_hit):
+        # We create a line extending the dir_hit vector
+        line = list(zip(*[loc_hit + dir_hit*l for l in range(20)]))
+        # This line is used to construct the impact_vector
+        impact_vector = loc_hit - loc_hit.dot(dir_hit)*dir_hit
+        # We save the length of the impact_vector. This is called the impact parameter in
+        # scattering problems
+        impact_par = np.linalg.norm(impact_vector)
+        # We normalize the impact vector. This way we get, together with dir_hit, an 
+        # othonormal basis
+        impact_vector_normed = impact_vector/impact_par
+        
+        return impact_vector_normed, impact_par
+
+    # Calculate the exit location and direction using the coordinates in the Impact Plane space
+    def getOutput(self, end_loc_impact_basis, end_dir_impact_basis, dir_hit_normed, impact_vector_normed):
+        end_loc = end_loc_impact_basis[0] * dir_hit_normed + end_loc_impact_basis[1] * impact_vector_normed
+        end_dir = end_dir_impact_basis[0] * dir_hit_normed + end_dir_impact_basis[1] * impact_vector_normed
+        
+        return end_loc, end_dir
+        
+
+    def getCoordinatesImpactPlane(self, loc_hit, dir_hit, end_loc, end_dir):
+        # We will create a basis from the impact vector and the hit direction
+        # The hit direction (dir_hit): the vector giving the direction which with the sphere is hit
+        # The impact vector: is the vector pointing from the origin and which is orthogonal 
+        #   to the hit direction vector. It is created from the dir_hit vector and the origin:
+        #   https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Vector_formulation
+        # We write the coordinates in this impact space (x, y) where x is the coordinate for the 
+        # hit_dir basis vector and y that for the impact_vector basis vector
+        # Then the coordinates of the hit_dir vector in this space is (1, 0), since it is a basis vector
+        
+        # Make sure it is normed
+        dir_hit = dir_hit / np.linalg.norm(dir_hit) 
+        
+        # Get the normed impact vector and impact parameter
+        impact_vector_normed, impact_par = self.getImpactParam(loc_hit, dir_hit)
+        
+        end_dir_impact_basis = (dir_hit.dot(end_dir), impact_vector_normed.dot(end_dir))
+        end_loc_impact_basis = (dir_hit.dot(end_loc), impact_vector_normed.dot(end_loc))
+        
+        return impact_par, end_dir_impact_basis, end_loc_impact_basis
+        
+    # This calculates a grid of exit locations and directions in terms of their coordinates in the
+    # ImpactPlane. These are later interpolated for ray tracing
+    def makeDataForRayTracer(self, SW, ratio_obj_to_blackhole = 20):
+        print("Starting data generation: ")
+        # NOTE THAT R_out, which is the ratio_obj_to_blackhole, is hardcoded in this data!
+        R_out = ratio_obj_to_blackhole #20 #(R_schw = 1, ratio is 20)
+        z0 = 0
+        #y = np.array(range(200))/10
+        y = np.array(range(ratio_obj_to_blackhole*100))/100
+
+        list_b, list_end_dir_impact_basis, list_end_loc_impact_basis = [], [], []
+        for y0 in y: 
+            x0 = -1* np.sqrt(R_out**2 - y0**2)
+
+            loc_hit = np.array([x0, y0, z0])
+            dir_hit = np.array([1, 0, 0])
+            dir_hit = dir_hit/np.linalg.norm(dir_hit)
+
+            x, y, z, end_loc, end_dir, mes = SW.ray_trace(dir_hit, loc_hit, curve_end=50, exit_tolerance = 0.)
+
+            if len(end_loc) != 0:
+                b, end_dir_impact_basis, end_loc_impact_basis = self.getCoordinatesImpactPlane(loc_hit, dir_hit, end_loc, end_dir)
+
+                list_b.append(b)
+                list_end_dir_impact_basis.append(end_dir_impact_basis)
+                list_end_loc_impact_basis.append(end_loc_impact_basis)
+
+        list_end_dir_impact_basis_x, list_end_dir_impact_basis_y = list(zip(*list_end_dir_impact_basis))
+        list_end_loc_impact_basis_x, list_end_loc_impact_basis_y = list(zip(*list_end_loc_impact_basis))
+
+        data = [list_b, list_end_dir_impact_basis_x, list_end_dir_impact_basis_y, \
+                list_end_loc_impact_basis_x, list_end_loc_impact_basis_y]
+        
+        print("Done")
+        return data
+
+
+    def generatedRayTracer(self, loc_hit, dir_hit):
+        # Scaling
+        R_sphere = np.linalg.norm(loc_hit)
+        scale_factor = self.ratio_obj_to_blackhole/R_sphere
+        loc_hit_original = loc_hit
+        loc_hit = loc_hit * scale_factor
+
+        # Getting the pre-calculated data
+        list_b, \
+        list_end_dir_impact_basis_x, \
+        list_end_dir_impact_basis_y, \
+        list_end_loc_impact_basis_x, \
+        list_end_loc_impact_basis_y = self.data[str(self.ratio_obj_to_blackhole)]
+
+        # Get the impact parameter and vector        
+        impact_vector_normed, impact_par = self.getImpactParam(loc_hit, dir_hit)
+        
+        # If the impact parameter is smaller than all pre-calculated ones, we assume it hits
+        # the blackhole
+        if impact_par < list_b[0]:
+            # Hit the BH
+            return [], [], {"message": "Blackhole"}
+        # If the impact parameter is larger than the pre-calculated values, you have inputted a
+        # hit_loc outside the sphere
+        elif impact_par > list_b[-1]:
+            return [], [], {"message": "Outside"}
+        else:
+            # Interpolate the coordinates in the ImpactPlane
+            end_dir_impact_basis = np.array([\
+                                        np.interp(impact_par, xp=list_b, fp=list_end_dir_impact_basis_x), \
+                                        np.interp(impact_par, xp=list_b, fp=list_end_dir_impact_basis_y)])
+
+            end_loc_impact_basis = np.array([\
+                                        np.interp(impact_par, xp=list_b, fp=list_end_loc_impact_basis_x), \
+                                        np.interp(impact_par, xp=list_b, fp=list_end_loc_impact_basis_y)])
+            
+            # Translate the coordinates to exit location and direction
+            end_loc_gen, end_dir_gen = self.getOutput(end_loc_impact_basis, end_dir_impact_basis, dir_hit, impact_vector_normed)
+            
+            # Scaling back
+            #print(np.linalg.norm(end_loc_gen), scale_factor)
+            end_loc_gen, end_dir_gen = end_loc_gen/scale_factor, end_dir_gen/scale_factor
+            #print(np.linalg.norm(end_loc_gen))
+            return end_loc_gen, end_dir_gen, {"message": ""}
+
