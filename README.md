@@ -9,7 +9,7 @@
 
 ![](images/lines_of_sight_0200.png)
 
-![](large_impact_param.png)
+![](images/large_impact_param.png)
 
 ![](images/small_impact_param.png)
 
