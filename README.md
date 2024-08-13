@@ -22,7 +22,7 @@
 
 ![](images/interpolation_error_0188.png)
 
-
+![](images/error_interpol.png)
 
 * For a simple math and physics explanation of what curvedpy does, see: [The_math_and_physics_behind_curvedpy.ipynb](tutorials/The_math_and_physics_behind_curvedpy.ipynb)
 
