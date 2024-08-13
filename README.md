@@ -1,8 +1,26 @@
-# CurvedPy: General Relativistic Ray Tracer for Blender
+# General Relativistic Ray Tracer for Blender
 
+## Introduction
 ![...](images/animation_12AUG2024_crop.gif)
 
 
+## How it works
+![](images/regions_0100.png)
+
+![](images/lines_of_sight_0200.png)
+
+![](large_impact_param.png)
+
+![](images/small_impact_param.png)
+
+
+## Goals and milestones
+
+
+
+## Known bugs
+
+![](images/interpolation_error_0188.png)
 
 
 
