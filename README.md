@@ -51,9 +51,9 @@ You can see even better how the lines of sight are deflected when the moon-like 
 If you are interested in a rundown on the maths (I tried to keep it to a level that you only need some (vector) calculus and linear algebra to follow the concepts), have a look here: [The_math_and_physics_behind_curvedpy.ipynb](tutorials/The_math_and_physics_behind_curvedpy.ipynb)
 
 For the code I have implemented I have used techniques from several peer-reviewed paper, among which:
-* Bronzwaer et al 2018 https://arxiv.org/abs/1801.10452
-* Davelaar et al 2023 https://arxiv.org/abs/2303.15522
-* Moscibrodzka et al 2023 https://arxiv.org/abs/2302.02733
+* <a href="https://arxiv.org/abs/1801.10452" target="_blank">Bronzwaer et al 2018 https://arxiv.org/abs/1801.10452 </a>
+* <a href="https://arxiv.org/abs/2303.15522" target="_blank">Davelaar et al 2023 https://arxiv.org/abs/2303.15522 </a>
+* <a href="https://arxiv.org/abs/2302.02733" target="_blank">Moscibrodzka et al 2023 https://arxiv.org/abs/2302.02733 </a>
 
 ## Use it yourself
 
