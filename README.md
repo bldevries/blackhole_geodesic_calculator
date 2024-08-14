@@ -53,6 +53,7 @@ You can see even better how the lines of sight are deflected when the moon-like 
 ## How it works - physics & math!
 This section is for those interested in the physics and maths. I will loosely explain how the path travelled by bodies in four dimensional space-times is calculated given a metric. I will leave out most of the math and proper definitions. It needs to be readable by people that have studied some calculus and mechanics. If you have studied some General Relativity and/or differential geometry, please keep the goal of the oversimplifications I make in mind. :) 
 
+### Trajectories in space-time: the geodesic equation
 So lets start with Newtons second law. In flat space the motion of bodies (in the classical limit) is described by the second law of Newton:
 
 $$
@@ -102,6 +103,63 @@ G_{\text{flat}} =
 \end{bmatrix}
 $$
 
+Here I have written the metric in Matrix notation. (For the connoisseur, the metric is a rank-2 tensor $g_{\sigma \rho}$). And the metric is part of the length of a vector through the innerproduct. The the length of a vector $\vec{V}$ is:
+
+$$
+\vec{V}\cdot\vec{V} = \vec{V}^{T} G_{\text{flat}} \vec{V} = \vec{V}^{T} \vec{V} = v_1^2 + v_2^2 + v_3^3
+$$
+
+Here we use standard matrix multiplication, $\vec{V}^{T}$ is the transpose of $\vec{V}$ making it a row vector and the components of $\vec{V}$ are $(v_1, v_2, v_3)$. And you see it all kind of ends with Pythagoras theorem and you see why you might never have heared of the metric. 
+
+A nice example of a more complicated metric in a familiar setting is that of the surface of a sphere. If you are interested in what this metric looks like and how you can use it, see my blog [Calculating lengths in curved spaces using SymPy’s symbolic mathematics, Python and Matplotlib](https://medium.com/@bldevries/calculating-lengths-in-curved-spaces-using-sympys-symbolic-mathematics-python-and-matplotlib-7c18da99fd7b).
+
+### A blackhole metric
+
+One of the metrics implemented in curvedpy is the Schwarzschild metric that describes space-time around a spherically symmetric blackhole. In Spherical coordinates this looks like:
+
+$$
+g_{\sigma \rho} = 
+\begin{bmatrix}
+-(1-\frac{r_s}{r}) & 0 & 0 & 0\\
+0 & \left(1-\frac{r_s}{r}\right)^{-1} & 0 & 0\\
+0 & 0 & r^2 & 0\\
+0 & 0 & 0 & r^2 \sin^2(\theta)
+\end{bmatrix}
+$$
+
+The package curvedpy actually used the Schwarzschild metric in cartesian coordinates. To show this we create a SchwarzschildGeodesic class:
+
+```SW = cp.SchwarzschildGeodesic()```
+
+And we can show the metric:
+
+```SW.g```
+
+The Christoffel Symbols $\Gamma$ are calculated using sympy and an example is:
+
+```SW.gam_y```
+
+### Solving the geodesic equation
+
+The geodesic equation is a not quite linear second order differential equation, so we need to use some numerical techniques to tackle it. The scipy packages has some nice integrators which we can use through the function ```solve_ivp```. For a simple example of how you can use this function check out my blog [Simply solving differential equations using Python, scipy and solve_ivp](https://medium.com/@bldevries/simply-solving-differential-equations-using-python-scipy-and-solve-ivp-f6185da2572d). 
+
+For ```solve_ivp``` to work we need to split the geodesic equation in first order equations by introducing the "velocity" $k^{\mu}$:
+
+$$
+\frac{d k^{\alpha}}{d \lambda} = 
+\text{ } -\Gamma^{\alpha}_{\nu \mu} \text{ }
+k^{\mu} \text{ } 
+k^{\nu}
+$$
+$$
+\frac{d x^{\beta}}{d\lambda} = k^{\beta}
+$$
+
+Now we can integrate these equations (these are 8 equations since the indices can take on 4 values) if we have an initial condition for the location $x$ and the "velocity" $k$. Or in other words, we need to have a beginning location and direction of movement.
+
+The integration of the geodesic equation is done in the function ```calc_trajectory```.
+
+How the function ```calc_trajectory``` and ```ray_trace``` are used in the class ```SchwarzschildGeodesic``` will be shown and explained in a separate jupyter notebook.
 
 ## How it works - numerical
 
