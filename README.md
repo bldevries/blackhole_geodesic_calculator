@@ -6,7 +6,7 @@
 | *Figure 1:* |
 
 
-
+<img src="images/animation_12AUG2024_crop.gif" alt="image" width="300" height="auto">
 
 ## How it works
 | ![Blender 3d scene view](images/3dview.png) |
