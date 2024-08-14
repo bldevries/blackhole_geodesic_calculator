@@ -35,19 +35,19 @@ In Fig. 5 examples are given in two dimensions of what happens inside the sphere
 
 |![](images/small_impact_param.png)|
 |:--:| 
-| *Figure 6:*|
+| *Figure 6: the same as Fig. 5 but with rays passing much closer to the blackhole. This shows that the deflection of rays by the curvature of space around a blackhole can be so extreme as to completely reverse the direction of the ray.*|
 
 With the insights of Fig. 4-6 we can now interpret the animations and images in Fig. 1-3 better. I roughly devided the image of the blackhole with only an HDRI in four regions in Fig. 7. In the outer green region you have very mild deflection of the lines of sight. In the blue region the lines of sight are more curved and lens the background galaxy in a circle around the center. In the yellowish region the curvature is so strong that the lines of sight can angle 90 degrees or more outwards (see fig. 5 for examples). In these cases you see the HDRI to the right/left/top/bottom sides of the blackhole or even de HDRI behind the camera (see the rays in Fig. 6). The inner black region is totally black because the lines of sight end on the blackhole.
 
 |<img src="images/regions_0100.png" alt="" width="400" height="auto">|
 |:--:| 
-| *Figure 7:*|
+| *Figure 7: roughly subdivinding the area around the blackhole based on how rays are effected. The inner rays fall into the blackhole and the image is black. Surrounding this region (yellow) is a region of very strong curvature and deflection of the rays. The pixels in this region can come from light coming from behind the camera or completely to the side. The blue region shows strong lensing of the background and the outer region in green shows the least deflection compared to the other areas.*|
 
 You can see even better how the lines of sight are deflected when the moon-like object fly passed and behind the blackhole. You can often see these objects through two lines of sight, see Fig. 8. You see one of the moons to the left of the blackhole, but also smaller and more deformed to the right. This image on the right formes from lines of sight that are deflected by angles of the order of 90 degrees, like you see in Fig. 5.
 
 |![](images/lines_of_sight_0200.png)|
 |:--:| 
-| *Figure 8:*|
+| *Figure 8: this render shows how one object can be visible through two lines of sight. The moon-like objects are behind the blackhole and you can see the on both sides of the blackhole. The image of the object at the outside of the blackhole comes from minimally deflected rays, while the image of the same object closer to the blackhole and on the other side comes from strongly deflected lines of sight.*|
 
 
 ## How it works - code organisation
