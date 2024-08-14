@@ -51,7 +51,7 @@ You can see even better how the lines of sight are deflected when the moon-like 
 
 
 ## How it works - code organisation
-
+As of now the code is in development. The idea for the general structure of the code is to have a Python package (called curvedpy) which can be installed using pip and a Blender add-on with the render engine that can be installed in Blender. The Python package does the ray tracing in curved space-time, which means solving the differential equations and any optimalizations therefor. The Blender render engine will interface with Blender and deal with the scene information and the traditional ray tracing in flat space. This code structure might change depending on how I will incorporate rendering of objects inside curved space-time. This might require less separation between the curved and flat ray tracing.
 
 ## How it works - physics & math!
 This section is for those interested in the physics and maths. I will loosely explain how the path travelled by bodies in four-dimensional space-times is calculated given a metric. I will leave out most of the math and proper definitions. It needs to be readable by people that have studied some calculus and mechanics. If you have studied some General Relativity and/or differential geometry, please keep the goal of the oversimplifications I make in mind. :) 
