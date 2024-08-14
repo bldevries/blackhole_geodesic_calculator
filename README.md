@@ -88,7 +88,7 @@ The term with $\Gamma$ adds the effect of curved space to the geodesic equation 
 
 The $\Gamma$ encodes all information of the curvature of space and these numbers are called Christoffel Symbols or Connection Symbols. They are calculated and defined as:
 
-$$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial_{\mu} g_{\nu \rho} + \partial_{\nu} g_{\rho \mu} - \partial_{\rho} g_{\mu \nu})$$
+$$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial _{\mu} g_{\nu \rho} + \partial _{\nu} g_{\rho \mu} - \partial _{\rho} g_{\mu \nu})$$
 
 $$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} \partial _{d}$$
 
