@@ -163,7 +163,7 @@ Now we can integrate these equations (these are 8 equations since the indices ca
 
 The integration of the geodesic equation is done in the function ```calc_trajectory```.
 
-How the function ```calc_trajectory``` and ```ray_trace``` are used in the class ```SchwarzschildGeodesic``` will be shown and explained in a separate jupyter notebook.
+How the function ```calc_trajectory``` and ```ray_trace``` are used in the class ```SchwarzschildGeodesic``` will be shown and explained in the next section and in a separate jupyter notebook.
 
 ## How it works - numerical
 
