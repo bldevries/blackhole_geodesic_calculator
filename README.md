@@ -90,7 +90,7 @@ The $\Gamma$ encodes all information of the curvature of space and these numbers
 
 $$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial\_{\mu} g_{\nu \rho} + \partial\_{\nu} g_{\rho \mu} - \partial\_{\rho} g_{\mu \nu})$$
 
-$$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} {\partial}\_{d}$$
+$$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial\_{\mu} g_{\nu \rho} $$
 
 Where $g_{\mu \nu}$ is the space-time metric. In short it encodes the length of between two points in space-time and is a part of the inner product between vectors.
 
