@@ -13,13 +13,21 @@
 :--:| 
 | *Figure 4: Blender 3d scene view for the animations in Fig. 1 and 2*|
 
-![](images/regions_0100.png)
+|![](images/regions_0100.png){width=50%}|
+|:--:| 
+| *Figure x:*|
 
-![](images/lines_of_sight_0200.png)
+|![](images/lines_of_sight_0200.png)|
+|:--:| 
+| *Figure x:*|
 
-![](images/large_impact_param.png)
+|![](images/large_impact_param.png)|
+|:--:| 
+| *Figure x:*|
 
-![](images/small_impact_param.png)
+|![](images/small_impact_param.png)|
+|:--:| 
+| *Figure x:*|
 
 * For a simple math and physics explanation of what curvedpy does, see: [The_math_and_physics_behind_curvedpy.ipynb](tutorials/The_math_and_physics_behind_curvedpy.ipynb)
 
