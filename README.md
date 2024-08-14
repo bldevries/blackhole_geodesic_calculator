@@ -1,8 +1,9 @@
 # General Relativistic Ray Tracer for Blender
 
 ## Introduction
-![...](images/animation_12AUG2024_crop.gif)
-*Fig. 1:*
+| ![...](images/animation_12AUG2024_crop.gif) | 
+|:--:| 
+| *Figure 1:* |
 
 
 
