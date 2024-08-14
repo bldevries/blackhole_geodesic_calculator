@@ -90,7 +90,7 @@ The $\Gamma$ encodes all information of the curvature of space and these numbers
 
 $$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial_{\mu} g_{\nu \rho} + \partial_{\nu} g_{\rho \mu} - \partial_{\rho} g_{\mu \nu})$$
 
-$$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial_{\mu} g_{\nu \rho} $$
+$$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} $$
 
 Where $g_{\mu \nu}$ is the space-time metric. In short it encodes the length of between two points in space-time and is a part of the inner product between vectors.
 
@@ -153,6 +153,8 @@ $$
 k^{\mu} \text{ } 
 k^{\nu}
 $$
+
+
 $$
 \frac{d x^{\beta}}{d\lambda} = k^{\beta}
 $$
