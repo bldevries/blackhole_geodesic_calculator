@@ -2,13 +2,14 @@
 
 ## Introduction
 ![...](images/animation_12AUG2024_crop.gif)
-
+*Fig. 1:*
 
 
 
 
 ## How it works
 ![Blender 3d scene view](images/3dview.png)
+* Fig. 4: Blender 3d scene view for the animations in Fig. 1 and 2*
 
 ![](images/regions_0100.png)
 
