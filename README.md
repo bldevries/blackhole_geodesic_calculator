@@ -1,4 +1,4 @@
-# Tracing rays around blackholes – A custom Blender render engine for curved space-time
+# Tracing rays around blackholes – A render engine for curved space-times in Blender
 
 ## Introduction
 
@@ -52,6 +52,20 @@ You can see even better how the lines of sight are deflected when the moon-like 
 
 ## How it works - math!
 If you are interested in a rundown on the maths (I tried to keep it to a level that you only need some (vector) calculus and linear algebra to follow the concepts), have a look here: [The_math_and_physics_behind_curvedpy.ipynb](tutorials/The_math_and_physics_behind_curvedpy.ipynb)
+
+So lets start with Newtons second law. In flat space the motion of bodies (in the classical limit) is described by the second law of Newton:
+
+$$
+\frac{d^2 x}{dt^2} = F/m
+$$
+
+Where F is the net force acting on the body, m is the body's mass and x is the location of the body. If no force is acting on the body this reduces to:
+
+$$
+\frac{d^2 x}{dt^2} = 0
+$$
+
+Which states that the velocity of the body is constant and $x(t)$ is a linear function of time. Or in other words, the body follows a straight line.
 
 For the code I have implemented I have used techniques from several peer-reviewed paper, among which:
 * <a href="https://arxiv.org/abs/1801.10452" target="_blank">Bronzwaer et al 2018: https://arxiv.org/abs/1801.10452 </a>
