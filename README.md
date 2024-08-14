@@ -4,10 +4,12 @@
 ![...](images/animation_12AUG2024_crop.gif)
 
 
-![...](images/3dview.png)
+
 
 
 ## How it works
+![Blender 3d scene view](images/3dview.png)
+
 ![](images/regions_0100.png)
 
 ![](images/lines_of_sight_0200.png)
@@ -26,6 +28,10 @@ Under construction.
 
 ## Goals and milestones
 
+
+## Installation
+
+Net avaliable yet, coming soon
 
 
 ## Known bugs
