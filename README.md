@@ -6,7 +6,7 @@ Einsteins theory of general relativity is the theory that describes gravity, bla
 
 | ![...](images/0-100_hdri_BG_crop.gif) | 
 |:--:| 
-| *Figure 1:* |
+| *Figure 1: a blackhole moving in from the left. There is only a background of stars and interstellar dust. When the blackhole moves in you can see how it warps and lenses the background.* |
 
 | ![...](images/) | 
 |:--:| 
