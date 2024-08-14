@@ -179,5 +179,5 @@ Now we can integrate these equations (these are 8 equations since the indices ca
 * For a tutorial and example on how to use curvedpy see: [Curvedpy_tutorial_and_examples.ipynb](tutorials/Curvedpy_tutorial_and_examples.ipynb) (coming soon!)
 
 ### Installation
-Net avaliable yet, coming soon
+Not avaliable yet, coming soon
 
