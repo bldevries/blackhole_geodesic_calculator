@@ -27,7 +27,5 @@ Under construction.
 
 ## Known bugs
 
-![](images/interpolation_error_0188.png)
 
-![](images/error_interpol.png)
 
