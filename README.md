@@ -1,5 +1,7 @@
 # Tracing rays around blackholes – A render engine for curved space-times in Blender
 
+Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de Vries</a>
+
 ## Introduction
 
 Einsteins theory of general relativity is the theory that describes gravity, blackholes and the structure of our cosmos. In this theory energy curves space-time and in turn this curvature determines how matter as well as light moves. This means that if we want to properly make an image of a blackhole in Blender, we must include curvature in our ray tracing. I made a first version of a custom render engine that implements Einstein theory. And since I am an astrophysicist, I want it to be scientifically correct. No tricks, no effects and no shortcuts. Let me show you how I am using scientific techniques to build a custom engine that renders a realistic blackhole in a Blender scene.
