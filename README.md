@@ -144,9 +144,15 @@ The Christoffel Symbols $\Gamma$ are calculated using sympy and an example can b
 
 To see this working, check out the [jupyter notebook](tutorials/The_math_and_physics_behind_curvedpy.ipynb) version of this text.
 
-### Solving the geodesic equation
+## How it works - numerical
+For the code I have implemented I have used techniques from several peer-reviewed papers and books, among which:
+* <a href="https://arxiv.org/abs/1801.10452" target="_blank">Bronzwaer et al 2018: https://arxiv.org/abs/1801.10452 </a>
+* <a href="https://arxiv.org/abs/2303.15522" target="_blank">Davelaar et al 2023: https://arxiv.org/abs/2303.15522 </a>
+* <a href="https://arxiv.org/abs/2302.02733" target="_blank">Moscibrodzka et al 2023: https://arxiv.org/abs/2302.02733 </a>
+* A first course in general relativity. Bernard Schutz
+* Spacetime and geometry. Carroll
 
-The geodesic equation is a not quite linear second order differential equation, so we need to use some numerical techniques to tackle it. The scipy packages has some nice integrators which we can use through the function ```solve_ivp```. For a simple example of how you can use this function check out my blog [Simply solving differential equations using Python, scipy and solve_ivp](https://medium.com/@bldevries/simply-solving-differential-equations-using-python-scipy-and-solve-ivp-f6185da2572d). 
+Let me briefly explain how I solve the geodesic equation. The geodesic equation is a not quite linear second order differential equation, so we need to use some numerical techniques to tackle it. The scipy packages has some nice integrators which we can use through the function ```solve_ivp```. For a simple example of how you can use this function check out my blog [Simply solving differential equations using Python, scipy and solve_ivp](https://medium.com/@bldevries/simply-solving-differential-equations-using-python-scipy-and-solve-ivp-f6185da2572d). 
 
 For ```solve_ivp``` to work we need to split the geodesic equation in first order equations by introducing the "velocity" $k^{\mu}$:
 
@@ -157,25 +163,12 @@ k^{\mu} \text{ }
 k^{\nu}
 $$
 
-
 $$
 \frac{d x^{\beta}}{d\lambda} = k^{\beta}
 $$
 
-Now we can integrate these equations (these are 8 equations since the indices can take on 4 values) if we have an initial condition for the location $x$ and the "velocity" $k$. Or in other words, we need to have a beginning location and direction of movement.
+Now we can integrate these equations (these are 8 equations since the indices can take on 4 values) if we have an initial condition for the location $x$ and the "velocity" $k$. Or in other words, we need to have a beginning location and direction of movement. The integration of the geodesic equation is done in the function ```calc_trajectory```.
 
-The integration of the geodesic equation is done in the function ```calc_trajectory```.
-
-How the function ```calc_trajectory``` and ```ray_trace``` are used in the class ```SchwarzschildGeodesic``` will be shown and explained in the next section and in a separate jupyter notebook.
-
-## How it works - numerical
-
-Coming soon. 
-
-For the code I have implemented I have used techniques from several peer-reviewed paper, among which:
-* <a href="https://arxiv.org/abs/1801.10452" target="_blank">Bronzwaer et al 2018: https://arxiv.org/abs/1801.10452 </a>
-* <a href="https://arxiv.org/abs/2303.15522" target="_blank">Davelaar et al 2023: https://arxiv.org/abs/2303.15522 </a>
-* <a href="https://arxiv.org/abs/2302.02733" target="_blank">Moscibrodzka et al 2023: https://arxiv.org/abs/2302.02733 </a>
 
 
 ## Goals and milestones
