@@ -2,6 +2,7 @@
 import sympy as sp
 import numpy as np
 from scipy.integrate import solve_ivp
+from scipy.interpolate import interp1d
 import time
 
 class SchwarzschildGeodesic:
@@ -139,7 +140,8 @@ class SchwarzschildGeodesic:
     def ray_trace(  self, direction, loc_hit, \
                     ratio_obj_to_blackhole = 20, \
                     exit_tolerance = 0.1, \
-                    curve_end = -1, \
+                    curve_end = 50, \
+                    interpolation_meth = "new",\
                     warnings = True, verbose=False):
         # loc_hit: the BH is assumed to be located at the origin and loc_hit is relative to the origin and thus location of the BH
         # R_obj_blender: the size of the object representing the black hole in Blender
@@ -172,42 +174,95 @@ class SchwarzschildGeodesic:
                         x0 = loc_hit[0], y0 = loc_hit[1], z0 = loc_hit[2], \
                         curve_end = curve_end, verbose=verbose) 
 
-
         k_x, x, k_y, y, k_z, z = res.y
 
-        if verbose: print(res)
-        if verbose: print("Start before cut: ", x[0], y[0], z[0])
-        
+        # If you hit a blackhole, just exit
+        if res["hit_blackhole"]:
+            return x, y, z, [], [], \
+                {"results": res, \
+                "hit_blackhole": res["hit_background"], \
+                "k": [k_x, k_y, k_z]}
+
+        # Scale the trajectory back
         x = x/scale_factor #+ loc_bh[0]
         y = y/scale_factor #+ loc_bh[1]
         z = z/scale_factor #+ loc_bh[2]
 
-        list_i = []
+        # Interpolation: we need to get the exit location and direction of the ray at R=R_sphere
+        # I have not yet found a good interpolator that interpolates trajectories. So I have a bit
+        # of a build around using interp from numpy. I find the data points around the exit and inter
+        # polate in that range. There I can garanty that the data points are increasing/decreasing.
+        # So first I find the indices around the exit point:
+        i_in, i_out = 0,0
         for i in range(len(x)):
-            if x[i]**2 + y[i]**2 + z[i]**2 < (R_sphere*(exit_tolerance+1.0))**2:
-                list_i.append(i)
-
-        list_i.append(list_i[-1]+1) # Add one more element outside
-
-        if verbose: print("Start after cut: ", x[0], y[0], z[0])
-
-        if len(list_i) == 0 or res["hit_blackhole"]:
-            return x, y, z, [], [], {"message": ""}
+            if i != 0:
+                if (x[i-1]**2 + y[i-1]**2 + z[i-1]**2 < (R_sphere*(exit_tolerance+1.0))**2) \
+                    and \
+                    (x[i]**2 + y[i]**2 + z[i]**2 >= (R_sphere*(exit_tolerance+1.0))**2):
+                    i_in, i_out = i-1, i
+        if i_in == 0 and i_out == 0:
+            end_loc, end_dir = [], []
         else:
-            x = x[list_i]
-            y = y[list_i]
-            z = z[list_i]
-            k_x = k_x[list_i]
-            k_y = k_y[list_i]
-            k_z = k_z[list_i]
+            # Then I take a range of indices over which to interpolate
+            if i_in-5 < 0: i_in = 0
+            else: i_in = i_in-5
+            if i_out+5 > len(x): i_out = len(x)
+            else: i_out = i_out + 5
 
-            # Forced normalization on the end_dir since it gave errors in trig functions. But need to
-            # see how much the direction from the integrator deviates from normalized.
-            end_dir = np.array([k_x[-1], k_y[-1], k_z[-1]]) / np.linalg.norm(np.array([k_x[-1], k_y[-1], k_z[-1]]))
-            end_loc = np.array([x[-1], y[-1], z[-1]])
+            # Then I interpolate using the radius as variable
+            R = np.sqrt(x**2 + y**2 + z**2)
+            #print("piep", i_in, i_out, len(x), R_sphere, R[i_in:i_out], x[i_in:i_out])
+            x_end = np.interp(R_sphere*(exit_tolerance+1.0), R[i_in:i_out], x[i_in:i_out])
+            y_end = np.interp(R_sphere*(exit_tolerance+1.0), R[i_in:i_out], y[i_in:i_out])
+            z_end = np.interp(R_sphere*(exit_tolerance+1.0), R[i_in:i_out], z[i_in:i_out])
+            k_x_end = np.interp(R_sphere*(exit_tolerance+1.0), R[i_in:i_out], k_x[i_in:i_out])
+            k_y_end = np.interp(R_sphere*(exit_tolerance+1.0), R[i_in:i_out], k_y[i_in:i_out])
+            k_z_end = np.interp(R_sphere*(exit_tolerance+1.0), R[i_in:i_out], k_z[i_in:i_out])
 
-            if verbose: print("Start after cut and rescaling: ", x[0], y[0], z[0])
-            return x, y, z, end_loc, end_dir, {"message": ""}
+            # This then gives me the end location and direction of the ray
+            end_loc = np.array([x_end, y_end, z_end])
+            end_dir = np.array([k_x_end, k_y_end, k_z_end])
+            end_dir = end_dir / np.linalg.norm(end_dir)
+
+        return x, y, z, end_loc, end_dir, \
+                {"results": res, \
+                "hit_blackhole": res["hit_background"], \
+                "k": [k_x, k_y, k_z]}
+        # else:
+        #     list_i = []
+        #     for i in range(len(x)):
+        #         if x[i]**2 + y[i]**2 + z[i]**2 < (R_sphere*(exit_tolerance+1.0))**2:
+        #             list_i.append(i)
+
+        #     list_i.append(list_i[-1]+1) # Add one more element outside
+            
+        #     end_dir = np.array([k_x[-1], k_y[-1], k_z[-1]]) / np.linalg.norm(np.array([k_x[-1], k_y[-1], k_z[-1]]))
+        #     end_loc = np.array([x[-1], y[-1], z[-1]])
+
+        #     if len(list_i) == 0 or res["hit_blackhole"]:
+        #         end_loc, end_dir = [], []
+        #     else:
+        #         x = x[list_i]
+        #         y = y[list_i]
+        #         z = z[list_i]
+        #         k_x = k_x[list_i]
+        #         k_y = k_y[list_i]
+        #         k_z = k_z[list_i]
+
+        #         # Forced normalization on the end_dir since it gave errors in trig functions. But need to
+        #         # see how much the direction from the integrator deviates from normalized.
+        #         end_dir = np.array([k_x[-1], k_y[-1], k_z[-1]]) / np.linalg.norm(np.array([k_x[-1], k_y[-1], k_z[-1]]))
+        #         end_loc = np.array([x[-1], y[-1], z[-1]])
+
+        #         if verbose: print("Start after cut and rescaling: ", x[0], y[0], z[0])
+        #         #return x, y, z, end_loc, end_dir, {"message": ""}
+
+
+
+
+        #if verbose: print("Start after cut: ", x[0], y[0], z[0])
+
+
 
 
 
