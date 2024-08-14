@@ -167,6 +167,8 @@ How the function ```calc_trajectory``` and ```ray_trace``` are used in the class
 
 ## How it works - numerical
 
+Coming soon. 
+
 For the code I have implemented I have used techniques from several peer-reviewed paper, among which:
 * <a href="https://arxiv.org/abs/1801.10452" target="_blank">Bronzwaer et al 2018: https://arxiv.org/abs/1801.10452 </a>
 * <a href="https://arxiv.org/abs/2303.15522" target="_blank">Davelaar et al 2023: https://arxiv.org/abs/2303.15522 </a>
@@ -178,7 +180,7 @@ For the code I have implemented I have used techniques from several peer-reviewe
 
 ## Use it yourself
 ### Examples
-* For a tutorial and example on how to use curvedpy see: [Curvedpy_tutorial_and_examples.ipynb](tutorials/Curvedpy_tutorial_and_examples.ipynb)
+* For a tutorial and example on how to use curvedpy see: [Curvedpy_tutorial_and_examples.ipynb](tutorials/Curvedpy_tutorial_and_examples.ipynb) (coming soon!)
 
 ### Installation
 Net avaliable yet, coming soon
