@@ -9,8 +9,9 @@
 
 
 ## How it works
-![Blender 3d scene view](images/3dview.png)
-* Fig. 4: Blender 3d scene view for the animations in Fig. 1 and 2*
+| ![Blender 3d scene view](images/3dview.png) |
+:--:| 
+| *Figure 4: Blender 3d scene view for the animations in Fig. 1 and 2*|
 
 ![](images/regions_0100.png)
 
