@@ -4,6 +4,9 @@
 ![...](images/animation_12AUG2024_crop.gif)
 
 
+![...](images/3dview.png)
+
+
 ## How it works
 ![](images/regions_0100.png)
 
