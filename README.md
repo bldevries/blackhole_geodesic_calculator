@@ -90,6 +90,8 @@ The $\Gamma$ encodes all information of the curvature of space and these numbers
 
 $$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial_{\mu} g_{\nu \rho} + \partial_{\nu} g_{\rho \mu} - \partial_{\rho} g_{\mu \nu})$$
 
+$$\gamma^{\sigma}_{\mu \nu}$$
+
 Where $g_{\mu \nu}$ is the space-time metric. In short it encodes the length of between two points in space-time and is a part of the inner product between vectors.
 
 Even though you have used the metric of flat Euclidean space many times, you might not have realized. This is because the metric in Euclidian space is:
