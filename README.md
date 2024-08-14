@@ -6,14 +6,13 @@
 | *Figure 1:* |
 
 
-<img src="images/animation_12AUG2024_crop.gif" alt="image" width="300" height="auto">
 
 ## How it works
 | ![Blender 3d scene view](images/3dview.png) |
 :--:| 
 | *Figure 4: Blender 3d scene view for the animations in Fig. 1 and 2*|
 
-|![](images/regions_0100.png){width=50%}|
+|<img src="images/regions_0100.png" alt="" width="400" height="auto">|
 |:--:| 
 | *Figure x:*|
 
