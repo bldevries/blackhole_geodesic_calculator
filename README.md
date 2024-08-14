@@ -50,8 +50,8 @@ You can see even better how the lines of sight are deflected when the moon-like 
 |:--:| 
 | *Figure 8:*|
 
-## How it works - math!
-If you are interested in a rundown on the maths (I tried to keep it to a level that you only need some (vector) calculus and linear algebra to follow the concepts), have a look here: [The_math_and_physics_behind_curvedpy.ipynb](tutorials/The_math_and_physics_behind_curvedpy.ipynb)
+## How it works - physics & math!
+This section is for those interested in the physics and maths. I will loosely explain how the path travelled by bodies in four dimensional space-times is calculated given a metric. I will leave out most of the math and proper definitions. It needs to be readable by people that have studied some calculus and mechanics. If you have studied some General Relativity and/or differential geometry, please keep the goal of the oversimplifications I make in mind. :) 
 
 So lets start with Newtons second law. In flat space the motion of bodies (in the classical limit) is described by the second law of Newton:
 
@@ -66,6 +66,44 @@ $$
 $$
 
 Which states that the velocity of the body is constant and $x(t)$ is a linear function of time. Or in other words, the body follows a straight line.
+
+In General Relativity a similar equation as the second law of Newton exists and is called the geodesic equation:
+
+$$
+\frac{d^2 x^{\alpha}}{d\tau^2} + \Gamma^{\alpha}_{\mu \nu} \frac{d x^{\nu}}{d\tau} \frac{d x^{\mu}}{d\tau} = 0
+$$
+
+This equation describes the motion of a body in four dimensional space (thus including time). At first sight this equation does not look similar to Newtons second law, but lets have a look. As with Newtons equation the $x$ describes the location of the body. Here $x^{\alpha}$ is the location of the body in four dimensional space. $x^{0}$ is the time coordinate and $x^{1}$, $x^{2}$ and $x^{3}$ are the spatial coordinates. You see that $\alpha$ (just as $\mu$ and $\nu$) is an index of the four-vector $x^{\alpha}$
+
+Now $\frac{d^2 x^{\alpha}}{d\tau^2}$ is the second derivative of the four-location $x$ to the parameter $\tau$. Here $\tau$ serves the function that time does in Newtons equation. The solution of the geodesic equation is thus $x(\tau)$, which describes a path in four-space. If the second term:
+
+$$\Gamma^{\alpha}_{\mu \nu} \frac{d x^{\nu}}{d\tau} \frac{d x^{\mu}}{d\tau}$$
+
+would not exist, the geodesic equation would reduce to Newtons equation (with F=0) and taking $\tau = x^{0} = t$. 
+
+The term with $\Gamma$ adds the effect of curved space to the geodesic equation and with that the geodesic equation becomes an equation that describes straight lines in curved space.
+
+(Note to self: Add more information on different and equivalent definitions of a straight line?)
+
+The $\Gamma$ encodes all information of the curvature of space and these numbers are called Christoffel Symbols or Connection Symbols. They are calculated and defined as:
+
+$$\Gamma^{\sigma}_{\mu \nu} = \frac{1}{2} g^{\sigma \rho} (\partial_{\mu} g_{\nu \rho} + \partial_{\nu} g_{\rho \mu} - \partial_{\rho} g_{\mu \nu})$$
+
+Where $g_{\mu \nu}$ is the space-time metric. In short it encodes the length of between two points in space-time and is a part of the inner product between vectors.
+
+Even though you have used the metric of flat Euclidean space many times, you might not have realized. This is because the metric in Euclidian space is:
+
+$$
+G_{\text{flat}} = 
+\begin{bmatrix}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+
+## How it works - numerical
 
 For the code I have implemented I have used techniques from several peer-reviewed paper, among which:
 * <a href="https://arxiv.org/abs/1801.10452" target="_blank">Bronzwaer et al 2018: https://arxiv.org/abs/1801.10452 </a>
