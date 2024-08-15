@@ -19,6 +19,11 @@ Einsteins theory of general relativity is the theory that describes gravity, bla
 | *Figure 3:* |
 
 
+## Updates!
+
+[![Update vlog on youtube](images/thumbs2.png)](https://youtu.be/Sk0AeKUhAXA?si=y-_B_J5zmxpNLZT5 "Update vlog 1")
+
+
 
 ## How it works - conceptually
 Before we go into the math and physics, lets conceptually try to understand what happens in Fig. 1-3. The renders in Fig. 1-3 are made using a very simple Blender scene setup shown in Fig. 4. The scene contains a region in which space-time is curved due to a blackhole in the centre (the blackhole is about 1/60th in size compared to the sphere in Blender). The other four small spheres are the moon-like objects you see in the animation. And then there is a camera. That is all (note there is also an HDRI image not visible in the 3d view of Fig. 4).
