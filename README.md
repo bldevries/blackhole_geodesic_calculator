@@ -29,7 +29,7 @@ Before we go into the math and physics, lets conceptually try to understand what
 
 What the render engine does is outside the blackhole sphere of influence (indicated with red in Fig. 4) it uses the ray_cast function implemented in Blender. Thus, outside this sphere the space-time is flat. When the ray hits the sphere the hit location and direction are passed to the general relativistic ray tracer. This calculates how the light ray is continued in the curved space-time until it hits the boundary of the sphere again. It then gives back the location and direction with which it exits the sphere. From here on the ray_trace function in Blender is again used to continue the ray tracing.
 
-|![](images/large_impact_param.png)|
+|![](images/large_impact_param_crossing.png)|
 |:--:| 
 | *Figure 5: a two-dimensional example of how rays are traced by the curvedpy python package. 17 rays all start at x = -15 R_Schwarzschild, indicated by a red dot. The black arrow shows the initial direction of the ray. In red you see the calculated ray path. The black disk at the origin represents the blackhole's Schwarzschild radius, also known as the event horizon. The Schwarzschild radius is given by 2GM/c^2 and is thus determined by the mass of the blackhole.*|
 
