@@ -20,8 +20,7 @@ Einsteins theory of general relativity is the theory that describes gravity, bla
 
 
 ## Updates!
-
-[![Update vlog on youtube](images/thumb2.png)](https://youtube.com/Sk0AeKUhAXA?si=y-_B_J5zmxpNLZT5 "Update vlog 1")
+[<img src="images/thumb_play.png" alt="" width="400" height="auto">](https://youtube.com/Sk0AeKUhAXA?si=y-_B_J5zmxpNLZT5 "Update vlog 1")
 
 
 
