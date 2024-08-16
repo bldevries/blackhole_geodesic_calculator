@@ -12,12 +12,12 @@ Einsteins theory of general relativity is the theory that describes gravity, bla
 
 | ![...](images/moons.gif) | 
 |:--:| 
-| *Figure 2: shooting moons by the blackhole. See how multiple images can be seen of the same object!* |
+| *Figure 2: shooting moons by the blackhole. See how multiple images can be seen of the same object! In Fig. 3 you can see what is going on in the Blender scene.* |
 
 
 |<img src="images/3dview_animation_moons.gif" alt="" width="300" height="auto">| 
 |:--:| 
-| *Figure 3:* |
+| *Figure 3: in Blender, the animation in Fig. 2 is nothing more then some spheres moving past the blackhole region. All the heavy lifting is done in the ray tracing through the curved space-time.* |
 
 ## Updates!
 Here is a list of my youtube video updates on the project.
