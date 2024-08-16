@@ -15,6 +15,10 @@ Einsteins theory of general relativity is the theory that describes gravity, bla
 | *Figure 2: shooting moons by the blackhole. See how multiple images can be seen of the same object!* |
 
 
+| ![...](images/3dview_animation_moons.gif) | 
+|:--:| 
+| *Figure 3:* |
+
 ## Updates!
 Here is a list of my youtube video updates on the project.
 
