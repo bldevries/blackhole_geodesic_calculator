@@ -10,16 +10,15 @@ Einsteins theory of general relativity is the theory that describes gravity, bla
 |:--:| 
 | *Figure 1: a (Schwarzschild) blackhole moving in from the left. There is only a background of stars and interstellar dust. When the blackhole moves in you can see how it warps and lenses the background.* |
 
-| ![...](images/moons_half_of_frames.gif) | 
+| ![...](images/moons.gif) | 
 |:--:| 
 | *Figure 2: shooting moons by the blackhole. See how multiple images can be seen of the same object!* |
 
-| ![...](images/) | 
-|:--:| 
-| *Figure 3:* |
-
 
 ## Updates!
+Here is a list of my youtube video updates on the project.
+
+### August 2024 update:
 [<img src="images/thumb_play.png" alt="" width="400" height="auto">](https://youtu.be/Sk0AeKUhAXA?si=P1IKgS9a0MaIZTv1 "Update vlog 1")
 
 

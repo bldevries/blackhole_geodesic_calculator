@@ -1,22 +1,5 @@
 
 
-# (base) vries001@M22D64KVHFNMV bin % pwd
-# /Applications/Blender_versions/Blender4.1.app/Contents/Resources/4.1/python/bin
-# (base) vries001@M22D64KVHFNMV bin % ./python3.11 -m pip install ~/Dropbox/0_DATA_BEN/PHYSICS/PROJECTS/blackhole_geodesic_calculator/python_pkg_dev/ -U
-
-
-bl_info = {
-    "name": "general_relativistic_ray_tracer",
-    "author": "B.L. de Vries",
-    "version": (0, 0, 202407100),
-    "blender": (4, 1, 0),
-    "location": "",
-    "description": "",
-    "warning": "",
-    "wiki_url": "",
-    "category": "Render",
-}
-
 from importlib import reload
 import bpy
 import mathutils
@@ -225,67 +208,17 @@ class CustomRenderEngine(bpy.types.RenderEngine):
         layer.rect = buf.tolist()
         self.end_result(result)
 
-
-
-
-def get_panels():
-    exclude_panels = {
-        'VIEWLAYER_PT_filter',
-        'VIEWLAYER_PT_layer_passes',
-    }
-
-    panels = []
-    for panel in bpy.types.Panel.__subclasses__():
-        #print(panel)
-        if hasattr(panel, 'COMPAT_ENGINES') and 'BLENDER_RENDER' in panel.COMPAT_ENGINES:
-            if panel.__name__ not in exclude_panels:
-                panels.append(panel)
-
-    return panels
-
-PROPS = [
-    ('background_image_renderer', bpy.props.StringProperty(name='File name', default='...', subtype='FILE_NAME')),
-
-]
-
-
-class EXAMPLE_PT_panel_1(bpy.types.Panel):
-    bl_label = "Panel 1"
-    bl_category = "Example tab"
-    bl_space_type = "PROPERTIES"
-    bl_region_type = "WINDOW"
-    bl_context = "world"
-    bl_options = {"DEFAULT_CLOSED"}
-    
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="This is panel 1.")
-        
-        row = layout.row()
-        row.label(text="Hello world!", icon='WORLD_DATA')
-
-        for (prop_name, _) in PROPS:
-            row = layout.row()
-            row.prop(context.scene, prop_name)
-        
-        
-
 def register():
     # Register the RenderEngine
     bpy.utils.register_class(CustomRenderEngine)
-    bpy.utils.register_class(EXAMPLE_PT_panel_1)
+    #bpy.utils.register_class(EXAMPLE_PT_panel_1)
 
     for (prop_name, prop_value) in PROPS:
         setattr(bpy.types.Scene, prop_name, prop_value)
 
-
     for panel in get_panels():
         panel.COMPAT_ENGINES.add('gr_ray_tracer')#CUSTOM')
     
-#    <class 'cycles.ui.NODE_CYCLES_WORLD_PT_ray_visibility'>
-#<class 'cycles.ui.NODE_CYCLES_WORLD_PT_settings'>
-#<class 'cycles.ui.NODE_CYCLES_WORLD_PT_settings_surface'>
-#<class 'cycles.ui.NODE_CYCLES_WORLD_PT_settings_volume'>
     from bl_ui import (
             properties_render,
             properties_material,
@@ -293,6 +226,7 @@ def register():
             properties_world,
 #            properties_texture,
             )
+
     from cycles import(ui)#  cycles.ui.CYCLES_WORLD_PT_settings_surface
     properties_world.WORLD_PT_context_world.COMPAT_ENGINES.add(CustomRenderEngine.bl_idname)
     #properties_world.WORLD_PT_environment_lighting.COMPAT_ENGINES.add(CustomRenderEngine.bl_idname)
@@ -302,11 +236,10 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(CustomRenderEngine)
-    bpy.utils.unregister_class(EXAMPLE_PT_panel_1)
+    #bpy.utils.unregister_class(EXAMPLE_PT_panel_1)
     
     for (prop_name, _) in PROPS:
         delattr(bpy.types.Scene, prop_name)
-        
         
     for panel in get_panels():
         if 'gr_ray_tracer' in panel.COMPAT_ENGINES:
