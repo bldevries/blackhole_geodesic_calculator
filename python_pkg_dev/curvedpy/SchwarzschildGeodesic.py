@@ -180,7 +180,7 @@ class SchwarzschildGeodesic:
         if res["hit_blackhole"]:
             return x, y, z, [], [], \
                 {"results": res, \
-                "hit_blackhole": res["hit_background"], \
+                "hit_blackhole": res["hit_blackhole"], \
                 "k": [k_x, k_y, k_z]}
 
         # Scale the trajectory back
@@ -224,9 +224,11 @@ class SchwarzschildGeodesic:
             end_dir = np.array([k_x_end, k_y_end, k_z_end])
             end_dir = end_dir / np.linalg.norm(end_dir)
 
+            end_loc = self.rayExitError(loc_hit_original, end_loc)
+
         return x, y, z, end_loc, end_dir, \
                 {"results": res, \
-                "hit_blackhole": res["hit_background"], \
+                "hit_blackhole": res["hit_blackhole"], \
                 "k": [k_x, k_y, k_z]}
         # else:
         #     list_i = []
@@ -262,6 +264,15 @@ class SchwarzschildGeodesic:
 
         #if verbose: print("Start after cut: ", x[0], y[0], z[0])
 
+    def approximateCurveEnd(self, ratio_obj_to_blackhole):
+        return 50 + 2*50*(ratio_obj_to_blackhole/20 -1)
+
+    def rayExitError(self, loc, end_loc):
+        correction_factor = 1.1
+        if np.linalg.norm(loc) >= np.linalg.norm(end_loc):
+            print("Warning (rayExitError): end_loc is not outside sphere. It has been corrected but should not happen. (hit_loc, end_loc) = ", (loc, end_loc))
+            end_loc = end_loc/np.linalg.norm(end_loc) * np.linalg.norm(loc) * correction_factor
+        return end_loc
 
 
 
@@ -269,11 +280,23 @@ class SchwarzschildGeodesic:
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 class ApproxSchwarzschildGeodesic:
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    def __init__(self, ratio_obj_to_blackhole = 20):
-        print("")
+    def __init__(self, ratio_obj_to_blackhole = 20, exit_tolerance = 0.1, extra_factor_curve_end = 1):
         self.ratio_obj_to_blackhole = ratio_obj_to_blackhole
-        SW = SchwarzschildGeodesic()
-        self.data = {str(ratio_obj_to_blackhole): self.makeDataForRayTracer(SW, ratio_obj_to_blackhole)}
+        self.exit_tolerance = exit_tolerance
+        
+
+        self.SW = SchwarzschildGeodesic()
+        self.curve_end = extra_factor_curve_end*self.SW.approximateCurveEnd(self.ratio_obj_to_blackhole)
+
+        print("Approximatation Class ApproxSchwarzschildGeodesic created")
+        print("  - ratio_obj_to_blackhole: ", self.ratio_obj_to_blackhole)
+        print("  - exit_tolerance: ", self.exit_tolerance)
+        print("  - curve_end: ", self.curve_end)
+        print("  - extra_factor_curve_end: ", extra_factor_curve_end)
+        print(" Starting data creation for interpolations ... ")
+
+        self.data = {str(ratio_obj_to_blackhole): self.makeDataForRayTracer()}
+        print("   Done.")
 
 
     # Get the impact parameter and vector
@@ -287,8 +310,11 @@ class ApproxSchwarzschildGeodesic:
         impact_par = np.linalg.norm(impact_vector)
         # We normalize the impact vector. This way we get, together with dir_hit, an 
         # othonormal basis
-        impact_vector_normed = impact_vector/impact_par
-        
+        if impact_par != 0:
+            impact_vector_normed = impact_vector/impact_par # !!! Check this, gives errors sometimes
+        else:
+            impact_vector_normed = impact_vector
+
         return impact_vector_normed, impact_par
 
     # Calculate the exit location and direction using the coordinates in the Impact Plane space
@@ -322,23 +348,30 @@ class ApproxSchwarzschildGeodesic:
         
     # This calculates a grid of exit locations and directions in terms of their coordinates in the
     # ImpactPlane. These are later interpolated for ray tracing
-    def makeDataForRayTracer(self, SW, ratio_obj_to_blackhole = 20):
-        print("Starting data generation: ")
-        # NOTE THAT R_out, which is the ratio_obj_to_blackhole, is hardcoded in this data!
-        R_out = ratio_obj_to_blackhole #20 #(R_schw = 1, ratio is 20)
+    def makeDataForRayTracer(self):
+        R_out = self.ratio_obj_to_blackhole #20 #(R_schw = 1, ratio is 20)
         z0 = 0
-        #y = np.array(range(200))/10
-        y = np.array(range(ratio_obj_to_blackhole*100))/100
+        y = np.array(range(1+self.ratio_obj_to_blackhole*100))/100
 
         list_b, list_end_dir_impact_basis, list_end_loc_impact_basis = [], [], []
         for y0 in y: 
+            # A ray directed at the middle of the BH gets through.
+            # This must be an integrator error I think and I need to test this
+            # For now I add a small deviation for things to get out right.
+            if y0 == 0.0: 
+                y0 += 0.001
+
+            # Calculate x0 based on y0 and z0
             x0 = -1* np.sqrt(R_out**2 - y0**2)
 
             loc_hit = np.array([x0, y0, z0])
             dir_hit = np.array([1, 0, 0])
             dir_hit = dir_hit/np.linalg.norm(dir_hit)
 
-            x, y, z, end_loc, end_dir, mes = SW.ray_trace(dir_hit, loc_hit, curve_end=50, exit_tolerance = 0.)
+            x, y, z, end_loc, end_dir, mes = self.SW.ray_trace(dir_hit, loc_hit, ratio_obj_to_blackhole = self.ratio_obj_to_blackhole, curve_end=self.curve_end, exit_tolerance = self.exit_tolerance)
+
+            if len(end_loc) != 0:
+                end_loc = self.SW.rayExitError(loc_hit, end_loc)
 
             if len(end_loc) != 0:
                 b, end_dir_impact_basis, end_loc_impact_basis = self.getCoordinatesImpactPlane(loc_hit, dir_hit, end_loc, end_dir)
@@ -353,7 +386,7 @@ class ApproxSchwarzschildGeodesic:
         data = [list_b, list_end_dir_impact_basis_x, list_end_dir_impact_basis_y, \
                 list_end_loc_impact_basis_x, list_end_loc_impact_basis_y]
         
-        print("Done")
+        #print("Done")
         return data
 
 
@@ -373,16 +406,21 @@ class ApproxSchwarzschildGeodesic:
 
         # Get the impact parameter and vector        
         impact_vector_normed, impact_par = self.getImpactParam(loc_hit, dir_hit)
+
+        mes = {"impact_par": impact_par, "impact_vector_normed": impact_vector_normed, "b": list_b}
         
         # If the impact parameter is smaller than all pre-calculated ones, we assume it hits
         # the blackhole
+        mes.update({"hit_blackhole": False})
         if impact_par < list_b[0]:
             # Hit the BH
-            return [], [], {"message": "Blackhole"}
+            mes["hit_blackhole"] = True
+            return [], [], mes
         # If the impact parameter is larger than the pre-calculated values, you have inputted a
         # hit_loc outside the sphere
         elif impact_par > list_b[-1]:
-            return [], [], {"message": "Outside"}
+            mes.update({"error": "Outside"})
+            return [], [], mes
         else:
             # Interpolate the coordinates in the ImpactPlane
             end_dir_impact_basis = np.array([\
@@ -398,7 +436,11 @@ class ApproxSchwarzschildGeodesic:
             
             # Scaling back
             #print(np.linalg.norm(end_loc_gen), scale_factor)
-            end_loc_gen, end_dir_gen = end_loc_gen/scale_factor, end_dir_gen/scale_factor
+            end_loc_gen, end_dir_gen = end_loc_gen/scale_factor, end_dir_gen#/scale_factor
+
+            end_loc_gen = self.SW.rayExitError(loc_hit_original, end_loc_gen)
+
             #print(np.linalg.norm(end_loc_gen))
-            return end_loc_gen, end_dir_gen, {"message": ""}
+            mes.update({"message": ""})
+            return end_loc_gen, end_dir_gen, mes
 

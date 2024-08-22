@@ -6,19 +6,26 @@ import mathutils
 import numpy as np
 import curvedpy
 import os
+import time
 reload(curvedpy)
 
 
 class CustomRenderEngine(bpy.types.RenderEngine):
     # Inspired by: https://docs.blender.org/api/current/bpy.types.RenderEngine.html?highlight=renderengine
-
     bl_idname = "gr_ray_tracer"
     bl_label = "General Relativistic Renderer"
     bl_use_preview = True
+    
+    ratio_obj_to_blackhole = 30
+    exit_tolerance = 0.02
+    aSW = curvedpy.ApproxSchwarzschildGeodesic(ratio_obj_to_blackhole = ratio_obj_to_blackhole, \
+                                                            exit_tolerance = exit_tolerance)
 
     # ############################################################################################################################
     def render(self, depsgraph):
     # ############################################################################################################################
+
+
 
         self.textures = self.loadTextures()
 
@@ -33,8 +40,11 @@ class CustomRenderEngine(bpy.types.RenderEngine):
         scale = depsgraph.scene.render.resolution_percentage / 100.0
         res_x = int(depsgraph.scene.render.resolution_x*scale)
         res_y = int(depsgraph.scene.render.resolution_y*scale)
-
+        
+        start = time.time()
         buf = self.ray_trace(depsgraph, res_x, res_y)
+        timeCalc = time.time() - start
+        print("Ray trace timing: ", timeCalc)
         buf.shape = -1,4
 
         # Here we write the pixel values to the RenderResult
@@ -45,85 +55,107 @@ class CustomRenderEngine(bpy.types.RenderEngine):
 
 
     # ############################################################################################################################
-    def ray_trace(self, depsgraph, width, height, approx = False):
+    def ray_trace(self, depsgraph, width, height, approx = True):
     # ############################################################################################################################
         
-        #print("Background: ", background)
-        
+        # SW is the Schwarzschild metric class that we use to do a ray cast in curved space-time
+        # We can use an approximation for testing
         if approx:
-            SW = curvedpy.ApproxSchwarzschildGeodesic()
+            SW = self.aSW
+        # Or the real deal for proper renders
         else:
-            SW = curvedpy.SchwarzschildGeodesic()
-            
+            SW = curvedpy.SchwarzschildGeodesic()   
+
+        # We collect the light objects in our scene            
         lamps = [ob for ob in depsgraph.scene.objects if ob.type == 'LIGHT']  
 
         # create a buffer to store the calculated intensities  
         buf = np.ones(width*height*4)
         buf.shape = height,width,4
-
+        
+        # This is the location and rotation of the camera
         origin = depsgraph.scene.camera.location  
         rotation = depsgraph.scene.camera.rotation_euler  
         
-        # loop over all pixels once (no multisampling)  
+        # loop over all pixels once (no multisampling yet)  
         for y in range(height):  
             for x in range(width):
                 # get the direction.  
                 # camera points in -x direction, FOV = 90 degrees  
                 x_render, y_render = (x-int(width/2))/width, (y-int(height/2))/height
-                dir = mathutils.Vector((x_render, y_render, -1))
-                dir.rotate(rotation)
+                direction = mathutils.Vector((x_render, y_render, -1))
+                direction.rotate(rotation)
                  
                 # cast a ray into the scene  
-                hit, loc, normal, index, ob, mat = depsgraph.scene.ray_cast(depsgraph, origin, dir)
+                hit, loc, normal, index, ob, mat = depsgraph.scene.ray_cast(depsgraph, origin, direction)
 
                 if hit:
                     if "isBH" in ob.data:
-                        buf[y,x,0:3] = self.blackhole_hit(SW, approx, depsgraph, dir, buf, lamps, hit, loc, normal, index, ob, mat)
+                        buf[y,x,0:3] = self.blackhole_hit(SW, approx, depsgraph, direction, buf, lamps, hit, loc, normal, index, ob, mat)
                     else:
                         buf[y,x,0:3] = self.normal_hit(depsgraph, lamps, hit, loc, normal, index, ob, mat)
                 else:
-                    buf[y,x,0:3] = self.background_hit(dir)
+                    buf[y,x,0:3] = self.background_hit(direction)
         return buf
 
     # ############################################################################################################################
-    def blackhole_hit(self, SW, approx, depsgraph, dir, buf, lamps, hit, loc, normal, index, ob, mat):
+    def blackhole_hit(self, SW, approx, depsgraph, direction, buf, lamps, hit, loc, normal, index, ob, mat):
     # ############################################################################################################################
         save_loc = loc
         save_ob = ob
         
+        # We will work in coordinates from the center of the blackhole
         loc = loc-ob.location
         
+        # We do a ray cast in curved space-time
+        # Either we do an approximated ray cast for texting purposes
         if approx:
-            end_loc, end_dir, mes = SW.generatedRayTracer(loc, dir)
+            end_loc, end_dir, mes = SW.generatedRayTracer(loc, direction)
+            error_mes = "loc: "+str(loc)+"-"+str(round(np.linalg.norm(loc), 6))+" end_loc: "+str(end_loc)+"-"+str(round(np.linalg.norm(end_loc), 6))
+            error_mes += ", end_dir: "+str(end_dir) + "dir: " + str(direction)
+        # Or the real ray cast
         else:
-            ratio_obj_to_blackhole = 60
-            x_SW, y_SW, z_SW, end_loc, end_dir, _ = SW.ray_trace(dir, \
+            x_SW, y_SW, z_SW, end_loc, end_dir, mes = SW.ray_trace(direction, \
                                                             loc_hit = loc, \
-                                                            exit_tolerance = 0.1, \
-                                                            ratio_obj_to_blackhole = ratio_obj_to_blackhole, \
-                                                            curve_end = 50 + 2*50*(ratio_obj_to_blackhole/20 -1),\
+                                                            exit_tolerance = self.exit_tolerance, \
+                                                            ratio_obj_to_blackhole = self.ratio_obj_to_blackhole, \
+                                                            curve_end = 50 + 2*50*(self.ratio_obj_to_blackhole/20 -1),\
                                                             warnings=False)
-        if end_loc == []:
+
+        # If we hit the blackhole, we can set the pixel to black
+        if mes['hit_blackhole']:
+            #print( mes['hit_blackhole'], end_loc == [] )
             return np.array([0, 0, 0])
-        
+        # Some extra error handeling that should not happen
+        if 'error' in mes.keys():
+            if mes['error'] == 'Outside':
+                # Marking pixels red
+                return np.array([1,0,0])
+            
+        # Otherwise, set the end_loc to the global coordinates
         end_loc = end_loc + ob.location
+        # And do a new raycast
         hit, loc, normal, index, ob, mat = depsgraph.scene.ray_cast(depsgraph, end_loc, end_dir) 
         
+        # If the second ray hits something
         if hit:
+            # It should not be the BH again, since it just came out of it
             if "isBH" in ob.data:
 
-                print(np.linalg.norm(save_loc-save_ob.location), np.linalg.norm(end_loc-ob.location), end_dir[2])
+                print(error_mes)
                 if end_dir[2] < 0:
                     return np.array([0, 0, 1])
                 else:
                     return np.array([0,1,0])
+            # If the second ray makes a proper hit, go on and do a normal hit
             return self.normal_hit(depsgraph, lamps, hit, loc, normal, index, ob, mat)        
         else:
+            # If the second ray hits nothing, do a background hit
             return self.background_hit(end_dir)
         
-        if ob != None:
-            if ob.name == 'Sphere':#.data["isBH"]:
-                hit = False
+#        if ob != None:
+#            if ob.name == 'Sphere':#.data["isBH"]:
+#                hit = False
 
     # ############################################################################################################################
     def normal_hit(self, depsgraph, lamps, hit, loc, normal, index, ob, mat, intensity = 10, eps = 1e-5, ):

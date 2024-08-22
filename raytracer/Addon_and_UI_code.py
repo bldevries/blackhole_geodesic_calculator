@@ -1,9 +1,9 @@
 
 
 
-# (base) vries001@M22D64KVHFNMV bin % pwd
+# (base) vries001@ bin % pwd
 # /Applications/Blender_versions/Blender4.1.app/Contents/Resources/4.1/python/bin
-# (base) vries001@M22D64KVHFNMV bin % ./python3.11 -m pip install ~/Dropbox/0_DATA_BEN/PHYSICS/PROJECTS/blackhole_geodesic_calculator/python_pkg_dev/ -U
+# (base) vries001@ bin % ./python3.11 -m pip install ~/Dropbox/0_DATA_BEN/PHYSICS/PROJECTS/blackhole_geodesic_calculator/python_pkg_dev/ -U
 
 
 # Needed for addon:
