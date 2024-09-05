@@ -182,9 +182,18 @@ Now we can integrate these equations (these are 8 equations since the indices ca
 
 ## Goals and milestones
 Ray Tracer
-* Add the ability to render objects *inside* the curved space-time region
 * Add a disk to the blackhole
+* Add multisampling
+* Allow camera to enter curved spacetime region
+* Increase sampling in the horizon region (try to make the ring of fire visible)
 * Add a metric that spans the whole scene
+* Add the ability to render objects *inside* the curved space-time region
+
+Testing:
+* Run on snellius
+* Collect some characteristics of photon trajectories for testing
+* Add a flat metric to the curvedpy code to compare curved and non curved scenarios precisely
+* Add a color coding option in Blender to find "rogue" rays
 
 Optimalization
 * Parallelization

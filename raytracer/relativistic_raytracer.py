@@ -18,15 +18,12 @@ class CustomRenderEngine(bpy.types.RenderEngine):
     
     ratio_obj_to_blackhole = 30
     exit_tolerance = 0.02
-    aSW = curvedpy.ApproxSchwarzschildGeodesic(ratio_obj_to_blackhole = ratio_obj_to_blackhole, \
-                                                            exit_tolerance = exit_tolerance)
+    #aSW = curvedpy.ApproxSchwarzschildGeodesic(ratio_obj_to_blackhole = ratio_obj_to_blackhole, \
+    #                                                        exit_tolerance = exit_tolerance)
 
     # ############################################################################################################################
     def render(self, depsgraph):
     # ############################################################################################################################
-
-
-
         self.textures = self.loadTextures()
 
         if self.is_preview:  # we might differentiate later
@@ -55,7 +52,7 @@ class CustomRenderEngine(bpy.types.RenderEngine):
 
 
     # ############################################################################################################################
-    def ray_trace(self, depsgraph, width, height, approx = True):
+    def ray_trace(self, depsgraph, width, height, approx = False):
     # ############################################################################################################################
         
         # SW is the Schwarzschild metric class that we use to do a ray cast in curved space-time
@@ -119,18 +116,64 @@ class CustomRenderEngine(bpy.types.RenderEngine):
                                                             loc_hit = loc, \
                                                             exit_tolerance = self.exit_tolerance, \
                                                             ratio_obj_to_blackhole = self.ratio_obj_to_blackhole, \
-                                                            curve_end = 50 + 2*50*(self.ratio_obj_to_blackhole/20 -1),\
-                                                            warnings=False)
+                                                            curve_end = SW.approximateCurveEnd(self.ratio_obj_to_blackhole))
+                                                            #curve_end = 50 + 2*50*(self.ratio_obj_to_blackhole/20 -1),\
+                                                            #warnings=False)
+        
 
+        
+        def checkHitDisk(x, y, z, ratio, R_in, R_out):
+            #R_in, R_out = 0.15*ratio, 0.8*ratio
+            #print(R_in, R_out, x[0], y[0], z[0])
+            for i in range(len(x)-1):
+                if (z[i+1] < 0 and z[i] >= 0) or (z[i+1] > 0 and z[i] <= 0):
+                    if ((x[i+1]**2 + y[i+1]**2 >= R_in**2) and (x[i+1]**2 + y[i+1]**2 <= R_out**2)) or \
+                        ((x[i]**2 + y[i]**2 >= R_in**2) and (x[i]**2 + y[i]**2 <= R_out**2)):
+                        #print("TRTUE", z[i], z[i+1], x[i+1]**2+y[i+1]**2, R_in, R_out)
+                        return {"hit": True, "loc": np.array([ (x[i+1]+x[i])/2, (y[i+1]+y[i])/2, (z[i+1]+z[i])/2 ])}
+                    #else:
+                    #    print("FALSE", z[i], z[i+1], x[i+1]**2+y[i+1]**2, R_in, R_out)
+                    #return True
+            return {"hit": False}
+        
+        
+        
+        disk_info = checkHitDisk(x_SW, y_SW, z_SW, self.ratio_obj_to_blackhole, R_in=0.15*self.ratio_obj_to_blackhole, R_out = 0.35*self.ratio_obj_to_blackhole)
+        
+#        if (loc[1] <= 0.0001 and loc[1] >= -0.0001) and (loc[2] <= 5 and loc[2] >= -5):
+#            stringprint = "{'loc': "+str(list(loc))+", 'dir': "+str(list(direction))+", 'hit_disk': "+str(disk_info['hit'])
+#            if disk_info["hit"]:
+#                stringprint += ", 'hit_disk_loc': "+str(list(disk_info["loc"]))
+#            stringprint += ", 'x': "+str(list(x_SW))
+#            stringprint += ", 'y': "+str(list(y_SW))
+#            stringprint += ", 'z': "+str(list(z_SW))
+#            stringprint += "},"
+#            print(stringprint)
+        
+        if disk_info["hit"]:
+            #if mes["hit_blackhole"]:
+                #if loc[1] <= 0.0001 and loc[1] >= -0.0001:
+                #    print(loc, direction)
+                #    print(disk_info["loc"])
+                
+                
+                #return np.array([0, 0, 1])
+            return np.array([1,1,1])
+
+#        impact_vector_normed, impact_par = SW.getImpactParam(loc, direction)
+#        if impact_par <= np.linalg.norm(loc)/self.ratio_obj_to_blackhole:
+#            return np.array([1,0,0])
+                    
         # If we hit the blackhole, we can set the pixel to black
         if mes['hit_blackhole']:
             #print( mes['hit_blackhole'], end_loc == [] )
-            return np.array([0, 0, 0])
+            return np.array([0, 1, 0])
         # Some extra error handeling that should not happen
         if 'error' in mes.keys():
             if mes['error'] == 'Outside':
                 # Marking pixels red
                 return np.array([1,0,0])
+            
             
         # Otherwise, set the end_loc to the global coordinates
         end_loc = end_loc + ob.location

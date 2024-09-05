@@ -176,6 +176,11 @@ class SchwarzschildGeodesic:
 
         k_x, x, k_y, y, k_z, z = res.y
 
+        # Scale the trajectory back
+        x = x/scale_factor #+ loc_bh[0]
+        y = y/scale_factor #+ loc_bh[1]
+        z = z/scale_factor #+ loc_bh[2]
+
         # If you hit a blackhole, just exit
         if res["hit_blackhole"]:
             return x, y, z, [], [], \
@@ -183,10 +188,6 @@ class SchwarzschildGeodesic:
                 "hit_blackhole": res["hit_blackhole"], \
                 "k": [k_x, k_y, k_z]}
 
-        # Scale the trajectory back
-        x = x/scale_factor #+ loc_bh[0]
-        y = y/scale_factor #+ loc_bh[1]
-        z = z/scale_factor #+ loc_bh[2]
 
         # Interpolation: we need to get the exit location and direction of the ray at R=R_sphere
         # I have not yet found a good interpolator that interpolates trajectories. So I have a bit
@@ -275,6 +276,23 @@ class SchwarzschildGeodesic:
         return end_loc
 
 
+    # Get the impact parameter and vector
+    def getImpactParam(self, loc_hit, dir_hit):
+        # We create a line extending the dir_hit vector
+        line = list(zip(*[loc_hit + dir_hit*l for l in range(20)]))
+        # This line is used to construct the impact_vector
+        impact_vector = loc_hit - loc_hit.dot(dir_hit)*dir_hit
+        # We save the length of the impact_vector. This is called the impact parameter in
+        # scattering problems
+        impact_par = np.linalg.norm(impact_vector)
+        # We normalize the impact vector. This way we get, together with dir_hit, an 
+        # othonormal basis
+        if impact_par != 0:
+            impact_vector_normed = impact_vector/impact_par # !!! Check this, gives errors sometimes
+        else:
+            impact_vector_normed = impact_vector
+
+        return impact_vector_normed, impact_par
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -299,23 +317,6 @@ class ApproxSchwarzschildGeodesic:
         print("   Done.")
 
 
-    # Get the impact parameter and vector
-    def getImpactParam(self, loc_hit, dir_hit):
-        # We create a line extending the dir_hit vector
-        line = list(zip(*[loc_hit + dir_hit*l for l in range(20)]))
-        # This line is used to construct the impact_vector
-        impact_vector = loc_hit - loc_hit.dot(dir_hit)*dir_hit
-        # We save the length of the impact_vector. This is called the impact parameter in
-        # scattering problems
-        impact_par = np.linalg.norm(impact_vector)
-        # We normalize the impact vector. This way we get, together with dir_hit, an 
-        # othonormal basis
-        if impact_par != 0:
-            impact_vector_normed = impact_vector/impact_par # !!! Check this, gives errors sometimes
-        else:
-            impact_vector_normed = impact_vector
-
-        return impact_vector_normed, impact_par
 
     # Calculate the exit location and direction using the coordinates in the Impact Plane space
     def getOutput(self, end_loc_impact_basis, end_dir_impact_basis, dir_hit_normed, impact_vector_normed):
@@ -339,7 +340,7 @@ class ApproxSchwarzschildGeodesic:
         dir_hit = dir_hit / np.linalg.norm(dir_hit) 
         
         # Get the normed impact vector and impact parameter
-        impact_vector_normed, impact_par = self.getImpactParam(loc_hit, dir_hit)
+        impact_vector_normed, impact_par = SW.getImpactParam(loc_hit, dir_hit)
         
         end_dir_impact_basis = (dir_hit.dot(end_dir), impact_vector_normed.dot(end_dir))
         end_loc_impact_basis = (dir_hit.dot(end_loc), impact_vector_normed.dot(end_loc))
@@ -405,7 +406,7 @@ class ApproxSchwarzschildGeodesic:
         list_end_loc_impact_basis_y = self.data[str(self.ratio_obj_to_blackhole)]
 
         # Get the impact parameter and vector        
-        impact_vector_normed, impact_par = self.getImpactParam(loc_hit, dir_hit)
+        impact_vector_normed, impact_par = SW.getImpactParam(loc_hit, dir_hit)
 
         mes = {"impact_par": impact_par, "impact_vector_normed": impact_vector_normed, "b": list_b}
         
