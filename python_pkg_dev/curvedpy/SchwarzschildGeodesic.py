@@ -6,7 +6,7 @@ from scipy.interpolate import interp1d
 import time
 
 class SchwarzschildGeodesic:
-    def __init__(self):
+    def __init__(self, metric = "schwarzschild"):
 
         self.r_s_value = 1 # We keep the Schwarzschild radius at one and scale appropriately
         self.time_like = False # No Massive particle geodesics yet
@@ -16,14 +16,26 @@ class SchwarzschildGeodesic:
         
         # Radial distance to BlackHole location
         self.R = sp.sqrt(self.x**2 + self.y**2 + self.z**2)
-        
+
+        self.n = sp.Matrix([\
+            [-1, 0, 0, 0],\
+            [0, 1, 0, 0],\
+            [0, 0, 1, 0],\
+            [0, 0, 0, 1]\
+            ])
+
         # The Schwarzschild metric
-        self.g = sp.Matrix([\
+        self.g_SW = sp.Matrix([\
             [-(1-self.r_s/(4*self.R))**2 / (1+self.r_s/(4*self.R))**2, 0, 0, 0],\
             [0, (1+self.r_s/(4*self.R))**4, 0, 0], \
             [0, 0, (1+self.r_s/(4*self.R))**4, 0], \
             [0, 0, 0, (1+self.r_s/(4*self.R))**4], \
               ])
+
+        if metric == "flat":
+            self.g = self.n
+        elif metric == "schwarzschild":
+            self.g = self.g_SW      
         
         # Connection Symbols
         self.gam_t = sp.Matrix([[self.gamma_func(0,mu, nu).simplify() for mu in [0,1,2,3]] for nu in [0,1,2,3]])
@@ -91,6 +103,7 @@ class SchwarzschildGeodesic:
                         curve_start = 0, \
                         curve_end = 50, \
                         nr_points_curve = 50, \
+                        max_step = np.inf,\
                         verbose = True \
                        ):
         # Step function needed for solve_ivp
@@ -124,7 +137,8 @@ class SchwarzschildGeodesic:
 
         start = time.time()
         result = solve_ivp(step, (curve_start, curve_end), values_0, t_eval=t_pts, \
-                           events=[hit_blackhole, hit_background])
+                           events=[hit_blackhole, hit_background],\
+                           max_step = max_step)
         end = time.time()
         if verbose: print("New: ", result.message, end-start, "sec")
             
@@ -142,6 +156,7 @@ class SchwarzschildGeodesic:
                     exit_tolerance = 0.1, \
                     curve_end = 50, \
                     interpolation_meth = "new",\
+                    max_step = np.inf,\
                     warnings = True, verbose=False):
         # loc_hit: the BH is assumed to be located at the origin and loc_hit is relative to the origin and thus location of the BH
         # R_obj_blender: the size of the object representing the black hole in Blender
@@ -172,7 +187,7 @@ class SchwarzschildGeodesic:
         res = self.calc_trajectory(\
                         k_x_0 = direction[0], k_y_0 = direction[1], k_z_0 = direction[2], \
                         x0 = loc_hit[0], y0 = loc_hit[1], z0 = loc_hit[2], \
-                        curve_end = curve_end, verbose=verbose) 
+                        curve_end = curve_end, max_step = max_step, verbose=verbose) 
 
         k_x, x, k_y, y, k_z, z = res.y
 

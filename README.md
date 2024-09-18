@@ -1,6 +1,6 @@
 # Tracing rays around blackholes – A render engine for curved space-times in Blender
 
-Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de Vries</a>
+Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de Vries</a>. PhD and Scientific visualisation advisor at <a href="https://www.surf.nl" target="_blank">SURF</a>.
 
 ## Introduction
 
@@ -182,20 +182,21 @@ Now we can integrate these equations (these are 8 equations since the indices ca
 
 ## Goals and milestones
 Ray Tracer
+* (2) Add multisampling
 * Add a disk to the blackhole
-* Add multisampling
 * Allow camera to enter curved spacetime region
 * Increase sampling in the horizon region (try to make the ring of fire visible)
 * Add a metric that spans the whole scene
 * Add the ability to render objects *inside* the curved space-time region
 
 Testing:
-* Run on snellius
-* Collect some characteristics of photon trajectories for testing
-* Add a flat metric to the curvedpy code to compare curved and non curved scenarios precisely
+* V Collect some characteristics of photon trajectories for testing
+* V Add a flat metric to the curvedpy code to compare curved and non curved scenarios precisely
 * Add a color coding option in Blender to find "rogue" rays
 
 Optimalization
+* (1) Commandline rendering
+* Run on snellius
 * Parallelization
 * Tensorflow model or interpolation of some of the calculations
 
