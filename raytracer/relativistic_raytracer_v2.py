@@ -29,18 +29,28 @@ class CustomRenderEngine(bpy.types.RenderEngine):
                 "high_PIA23647": {"file_name": "high_PIA23647.png", "texture_name": "high_PIA23647.png"},\
                 "perseus-cluster": {"file_name": "high_1-Perseus-cluster_1oEasJg_6500×6500.jpg", "texture_name": "high_1-Perseus-cluster_1oEasJg_6500×6500.jpg"},\
                 "moon": {"file_name": "8k_moon.jpg", "texture_name": "8k_moon.jpg"},\
-                "test": {"file_name": "test.png", "texture_name": "test"}}
+                "test": {"file_name": "test.png", "texture_name": "test"},\
+                "disk_clouds": {"file_name": "clouds_seamless_1024-512.png", "texture_name": "clouds_seamless_1024-512"},\
+                "disk_clouds_high_contr": {"file_name": "clouds_seamless_2024_512_high_contr.png", "texture_name": "clouds_seamless_2024_512_high_contr"},\
+                }
     texture_dir ='/Users/vries001/Dropbox/0_DATA_BEN/PHYSICS/PROJECTS/blackhole_geodesic_calculator/raytracer/textures/'
+
+    aSW = None #curvedpy.ApproxSchwarzschildGeodesic(ratio_obj_to_blackhole = 30., \
+                #                                               exit_tolerance = 0.2)
 
     # ############################################################################################################################
     def render(self, depsgraph):
     # ############################################################################################################################
+
         print("Starting Render")
         self.ratio_obj_to_blackhole = depsgraph.scene.ratio_obj_to_blackhole
         self.exit_tolerance = depsgraph.scene.exit_tolerance
         self.max_integration_step = depsgraph.scene.max_integration_step
         self.disk_on = depsgraph.scene.disk_on
+        self.disk_phase = depsgraph.scene.disk_phase
+        self.approx = depsgraph.scene.approx
         self.back_ground_texture_key = depsgraph.scene.back_ground_texture_key
+        self.disk_texture = depsgraph.scene.disk_texture
         self.metric = depsgraph.scene.metric
 
         if self.max_integration_step == -1:
@@ -54,21 +64,55 @@ class CustomRenderEngine(bpy.types.RenderEngine):
         print("  - ", self.back_ground_texture_key)
         print("  - ", self.max_integration_step)
 
+        # Initiate the geodesic solver
+        self.SW = curvedpy.SchwarzschildGeodesic(metric=self.metric)
+
         if self.disk_on and self.approx:
             print("WARNING: disk and approx are both on but do not work together. The disk is turned of.")
             self.disk_on = False
 
-        if self.approx:
-            aSW = curvedpy.ApproxSchwarzschildGeodesic(ratio_obj_to_blackhole = ratio_obj_to_blackhole, \
-                                                                   exit_tolerance = exit_tolerance)
-        else:
-            aSW = None
+        # FIX THIS!
+        #if self.aSW == None:
+            # print("First time loading approx data")
+            # self.aSW = curvedpy.ApproxSchwarzschildGeodesic(ratio_obj_to_blackhole = self.ratio_obj_to_blackhole, \
+            #                                                    exit_tolerance = self.exit_tolerance)
+        if self.aSW != None:
+            if round(self.exit_tolerance,4) != round(self.aSW.exit_tolerance, 4) or round(self.ratio_obj_to_blackhole, 4) != round(self.aSW.ratio_obj_to_blackhole, 4):
+                print("Reloading approx data because settings have changed")
+                self.aSW = curvedpy.ApproxSchwarzschildGeodesic(ratio_obj_to_blackhole = self.ratio_obj_to_blackhole, \
+                                                                   exit_tolerance = self.exit_tolerance)
 
+        #if self.approx:
+            # If we want to approx, also initiate the approximate geodesic solver
+
+        #else:
+        #    self.aSW = None
 
         self.loadTextures()
-        # For some reason I need to update the depsgraph otherwise things wont render 
-        # from the console properly using "-f <frame_nr>"
+
+        # # For some reason I need to update the depsgraph otherwise things wont render 
+        # # from the console properly using "-f <frame_nr>"
+        # depsgraph.update()
+        # print("render(self, depsgraph): ", depsgraph, depsgraph.scene, depsgraph.scene_eval)
+        # print("Frame: ", depsgraph.scene.frame_current, depsgraph.scene_eval.frame_current)
+        # print(depsgraph.scene.objects['Sphere.001'].location)
+        # print(depsgraph.scene_eval.objects['Sphere.001'].location)
+
+        
+        # depsgraph_context = bpy.context.evaluated_depsgraph_get() 
+        # print("bpy.context.evaluated_depsgraph_get(): ", depsgraph_context, depsgraph_context.scene, depsgraph_context.scene_eval)
+        # print("Frame: ", depsgraph_context.scene.frame_current, depsgraph_context.scene_eval.frame_current)
+        # print(depsgraph_context.scene.objects['Sphere.001'].location)
+        # print(depsgraph_context.scene_eval.objects['Sphere.001'].location)
+
+        # # This might be a horrible hack :S
         depsgraph = bpy.context.evaluated_depsgraph_get() 
+        depsgraph.update()
+        #depsgraph.scene_eval.frame_set(depsgraph.scene.frame_current)
+        print("FINALLY USING Frame: ", depsgraph, depsgraph.scene.frame_current, depsgraph.scene_eval.frame_current)
+        print(depsgraph.scene.objects['Sphere.001'].location)
+        print(depsgraph.scene_eval.objects['Sphere.001'].location)
+
 
 
         if self.is_preview:  # we might differentiate later
@@ -133,15 +177,10 @@ class CustomRenderEngine(bpy.types.RenderEngine):
     # ############################################################################################################################
     def ray_trace(self, depsgraph, width, height, depths, buf, samples, approx = False):
     # ############################################################################################################################
-        
-        # SW is the Schwarzschild metric class that we use to do a ray cast in curved space-time
-        # We can use an approximation for testing
-        if approx:
-            SW = self.aSW
-        # Or the real deal for proper renders
-        else:
-            SW = curvedpy.SchwarzschildGeodesic(metric=self.metric)#flat')   #schwarzschild
+        print("scene ray trace: ", depsgraph.scene.frame_current)
+        print("scene_eval ray trace: ", depsgraph.scene_eval.frame_current)
 
+        
         # We collect the light objects in our scene            
         lamps = [ob for ob in depsgraph.scene.objects if ob.type == 'LIGHT']  
 
@@ -190,10 +229,11 @@ class CustomRenderEngine(bpy.types.RenderEngine):
 
                             # cast a ray into the scene  
                             hit, loc, normal, index, ob, mat = depsgraph.scene.ray_cast(depsgraph, origin, direction)
+                            #hit, loc, normal, index, ob, mat = depsgraph.scene_eval.ray_cast(depsgraph, origin, direction)
 
                             if hit:
                                 if "isBH" in ob.data:
-                                    sbuf[y,x,0:3] += self.blackhole_hit(SW, approx, depsgraph, direction, buf, lamps, hit, loc, normal, index, ob, mat)
+                                    sbuf[y,x,0:3] += self.blackhole_hit(self.SW, approx, depsgraph, direction, buf, lamps, hit, loc, normal, index, ob, mat)
                                 else:
                                     sbuf[y,x,0:3] += self.normal_hit(depsgraph, lamps, hit, loc, normal, index, ob, mat)
                             else:
@@ -223,58 +263,43 @@ class CustomRenderEngine(bpy.types.RenderEngine):
         
         # We do a ray cast in curved space-time
         # Either we do an approximated ray cast for texting purposes
-        if approx:
-            end_loc, end_dir, mes = SW.generatedRayTracer(loc, direction)
+        if self.approx:
+            end_loc, end_dir, mes = self.aSW.generatedRayTracer(loc, direction)
             error_mes = "loc: "+str(loc)+"-"+str(round(np.linalg.norm(loc), 6))+" end_loc: "+str(end_loc)+"-"+str(round(np.linalg.norm(end_loc), 6))
             error_mes += ", end_dir: "+str(end_dir) + "dir: " + str(direction)
         # Or the real ray cast
         else:
-            x_SW, y_SW, z_SW, end_loc, end_dir, mes = SW.ray_trace(direction, \
+            x_SW, y_SW, z_SW, end_loc, end_dir, mes = self.SW.ray_trace(direction, \
                                                             loc_hit = loc, \
                                                             exit_tolerance = self.exit_tolerance, \
                                                             ratio_obj_to_blackhole = self.ratio_obj_to_blackhole, \
-                                                            curve_end = SW.approximateCurveEnd(self.ratio_obj_to_blackhole),\
+                                                            curve_end = self.SW.approximateCurveEnd(self.ratio_obj_to_blackhole),\
                                                             max_step = self.max_integration_step)
                                                             #curve_end = 50 + 2*50*(self.ratio_obj_to_blackhole/20 -1),\
                                                             #warnings=False)
+
+            # If we hit the disk        
+            if self.disk_on:
+                disk_info = self.checkHitDisk(x_SW, y_SW, z_SW, self.ratio_obj_to_blackhole, R_in=0.15*self.ratio_obj_to_blackhole, R_out = 0.35*self.ratio_obj_to_blackhole)
+                if disk_info["hit"]:
+
+
+                    # !!! NOTE: I AM SKIPPING THE POSSIBILITY THAT THE BACKGROUND COLOR HITS AN OBJECT IN THE BLENDER SCENE
+                    # Get background color:
+                    if mes['hit_blackhole']:
+                        #print( mes['hit_blackhole'], end_loc == [] )
+                        back_ground_color = np.array([0, 0, 0])
+                    elif 'error' in mes.keys():
+                        back_ground_color = np.array([0, 0, 0])
+                    else:
+                        back_ground_color = np.array([0, 0, 0])#self.background_hit(end_dir)
+
+                    color = disk_info['color']*disk_info['intensity']# + back_ground_color * (1-disk_info['intensity'])
+
+                    return color #disk_info['color'] #np.array([1,1,1])
+
         if self.mark_x_min != -1 or self.mark_x_max != -1 or self.mark_y_min != -1 or self.mark_y_max != -1:
             self.debug_string += "["+str(list(loc))+", "+str(list(direction))+", "+str(list(end_loc))+", "+str(list(end_dir))+"], "
-
-        
-        # if(np.linalg.norm(end_loc) < np.linalg.norm(loc)):
-        #     print("Exit does not work!!!!")
-
-        def checkHitDisk(x, y, z, ratio, R_in, R_out):
-            #R_in, R_out = 0.15*ratio, 0.8*ratio
-            #print(R_in, R_out, x[0], y[0], z[0])
-            for i in range(len(x)-1):
-                if (z[i+1] < 0 and z[i] >= 0) or (z[i+1] > 0 and z[i] <= 0):
-
-                    l0 = -z[i]/(z[i+1]-z[i])
-                    x_disk = x[i]+(x[i+1]-x[i])*l0
-                    y_disk = y[i]+(y[i+1]-y[i])*l0
-
-                    R = np.sqrt(x_disk**2 + y_disk**2)
-                    if (R <= R_out) and (R >= R_in):
-
-
-                        scale = (R-R_in)/(R_out-R_in)
-                        rgb = np.array([1, 0.3 + (1-scale)*(0.9-0.3)  ,0.0])
-                        return {"hit": True, "loc": np.array([ x_disk, y_disk, 0.0 ]), "color": rgb}
-
-
-
-                    # if ((x[i+1]**2 + y[i+1]**2 >= R_in**2) and (x[i+1]**2 + y[i+1]**2 <= R_out**2)) or \
-                    #     ((x[i]**2 + y[i]**2 >= R_in**2) and (x[i]**2 + y[i]**2 <= R_out**2)):
-                    #     return {"hit": True, "loc": np.array([ (x[i+1]+x[i])/2, (y[i+1]+y[i])/2, (z[i+1]+z[i])/2 ])}
-
-            return {"hit": False}
-        
-        # If we hit the disk        
-        if self.disk_on:
-            disk_info = checkHitDisk(x_SW, y_SW, z_SW, self.ratio_obj_to_blackhole, R_in=0.15*self.ratio_obj_to_blackhole, R_out = 0.35*self.ratio_obj_to_blackhole)
-            if disk_info["hit"]:
-                return disk_info['color'] #np.array([1,1,1])
                     
         # If we hit the blackhole, we can set the pixel to black
         if mes['hit_blackhole']:
@@ -286,7 +311,8 @@ class CustomRenderEngine(bpy.types.RenderEngine):
                 # Marking pixels red
                 return np.array([1,0,0])
             
-            
+        #print("TESTTT LOC:L ",ob.evaluated_get(depsgraph).location, ob.location)  
+
         # Otherwise, set the end_loc to the global coordinates
         end_loc = end_loc + ob.location
         # And do a new raycast
@@ -380,6 +406,55 @@ class CustomRenderEngine(bpy.types.RenderEngine):
             return color
 
     # ############################################################################################################################
+
+    # ############################################################################################################################
+    def checkHitDisk(self, x, y, z, ratio, R_in, R_out):
+        disk_tex_name = self.textures[self.disk_texture]['texture_name']
+
+        #R_in, R_out = 0.15*ratio, 0.8*ratio
+        #print(R_in, R_out, x[0], y[0], z[0])
+        for i in range(len(x)-1):
+            if (z[i+1] < 0 and z[i] >= 0) or (z[i+1] > 0 and z[i] <= 0):
+
+                l0 = -z[i]/(z[i+1]-z[i])
+                x_disk = x[i]+(x[i+1]-x[i])*l0
+                y_disk = y[i]+(y[i+1]-y[i])*l0
+
+                R = np.sqrt(x_disk**2 + y_disk**2)
+                if (R <= R_out) and (R >= R_in):
+
+
+                    scale = (R-R_in)/(R_out-R_in)
+
+                    mean, stddev = 0.5, 0.8
+                    intensity = np.exp(-((scale-mean)**2)/(2*stddev**2)) * 1/(np.sqrt(2*np.pi*stddev)) 
+
+                    texture_x = (self.disk_phase + np.arccos(x_disk/R) * (y_disk/np.absolute(y_disk))) / np.pi #x_disk/R
+
+                    rgb = np.array(bpy.data.textures[disk_tex_name].evaluate( (texture_x, (R-R_in)/(R_out-R_in), 0) ).xyz)
+                    #rgb = np.array([0.5, 0.5, 0.5])*intensity
+
+                    #intensity = np.array(bpy.data.textures[disk_tex_name].evaluate( (x_disk/R, (R-R_in)/(R_out-R_in), 0) ))[1]
+                        #(np.arccos(x_disk/R)/(np.pi), (R-R_in)/(R_out-R_in) ,0) ))[3]
+                    #print(intensity, x_disk/R, y_disk/R)
+                    # if np.arccos(x_disk/R) > 0 and np.arccos(x_disk/R) < 1/2 * np.pi:
+                    #     intensity = 0
+                    # else:
+                    #     intensity = 1
+
+                    # print(np.arccos(x_disk/R) > 0 and np.arccos(x_disk/R) < 1/2 * np.pi, intensity, np.arccos(x_disk/R))
+
+                    return {"hit": True, "loc": np.array([ x_disk, y_disk, 0.0 ]), "color": rgb, "intensity":intensity}
+
+
+
+                # if ((x[i+1]**2 + y[i+1]**2 >= R_in**2) and (x[i+1]**2 + y[i+1]**2 <= R_out**2)) or \
+                #     ((x[i]**2 + y[i]**2 >= R_in**2) and (x[i]**2 + y[i]**2 <= R_out**2)):
+                #     return {"hit": True, "loc": np.array([ (x[i+1]+x[i])/2, (y[i+1]+y[i])/2, (z[i+1]+z[i])/2 ])}
+
+        return {"hit": False}
+
+    # ############################################################################################################################
     def loadTextures(self):
     # ############################################################################################################################
                             
@@ -433,7 +508,10 @@ PROPS = [
      ('exit_tolerance', bpy.props.FloatProperty(name='Exit Tolerance', default=0.2)),
      ('max_integration_step', bpy.props.FloatProperty(name='max_integration_step', default=10000)),
      ('disk_on', bpy.props.BoolProperty(name='Disk', default=False)),
+     ('disk_phase', bpy.props.FloatProperty(name='disk_phase', default=0)),
+     ('approx', bpy.props.BoolProperty(name='Approx', default=False)),
      ('back_ground_texture_key', bpy.props.StringProperty(name='back_ground_texture_key', default="bg_ngc3293")),
+     ('disk_texture', bpy.props.StringProperty(name='disk_texture', default="disk_clouds_high_contr")),
      ('mark_y_min', bpy.props.FloatProperty(name='mark_y_min', default=-1.)),
      ('mark_y_max', bpy.props.FloatProperty(name='mark_y_max', default=-1.)),
      ('mark_x_min', bpy.props.FloatProperty(name='mark_x_min', default=-1.)),
@@ -471,7 +549,10 @@ class CUSTOM_RENDER_PT_blackhole(RenderButtonsPanel, Panel):
         col.row().prop(rd, "exit_tolerance", text="exit_tolerance")#, expand=True)  
         col.row().prop(rd, "max_integration_step", text="max_integration_step")#, expand=True)  
         col.row().prop(rd, "disk_on", text="disk_on")
+        col.row().prop(rd, "disk_phase", text="Disk phase")
+        col.row().prop(rd, "approx", text="Approximate")
         col.row().prop(rd, "back_ground_texture_key", text="back_ground_texture_key")
+        col.row().prop(rd, "disk_texture", text="Disk texture") 
         col.row().prop(rd, "mark_x_min", text="mark_x_min")
         col.row().prop(rd, "mark_x_max", text="mark_x_max")
         col.row().prop(rd, "mark_y_min", text="mark_y_min")

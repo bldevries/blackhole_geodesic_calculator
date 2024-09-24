@@ -355,7 +355,7 @@ class ApproxSchwarzschildGeodesic:
         dir_hit = dir_hit / np.linalg.norm(dir_hit) 
         
         # Get the normed impact vector and impact parameter
-        impact_vector_normed, impact_par = SW.getImpactParam(loc_hit, dir_hit)
+        impact_vector_normed, impact_par = self.SW.getImpactParam(loc_hit, dir_hit)
         
         end_dir_impact_basis = (dir_hit.dot(end_dir), impact_vector_normed.dot(end_dir))
         end_loc_impact_basis = (dir_hit.dot(end_loc), impact_vector_normed.dot(end_loc))
@@ -367,7 +367,7 @@ class ApproxSchwarzschildGeodesic:
     def makeDataForRayTracer(self):
         R_out = self.ratio_obj_to_blackhole #20 #(R_schw = 1, ratio is 20)
         z0 = 0
-        y = np.array(range(1+self.ratio_obj_to_blackhole*100))/100
+        y = np.array(range(1+int(self.ratio_obj_to_blackhole)*100))/100
 
         list_b, list_end_dir_impact_basis, list_end_loc_impact_basis = [], [], []
         for y0 in y: 
@@ -421,7 +421,7 @@ class ApproxSchwarzschildGeodesic:
         list_end_loc_impact_basis_y = self.data[str(self.ratio_obj_to_blackhole)]
 
         # Get the impact parameter and vector        
-        impact_vector_normed, impact_par = SW.getImpactParam(loc_hit, dir_hit)
+        impact_vector_normed, impact_par = self.SW.getImpactParam(loc_hit, dir_hit)
 
         mes = {"impact_par": impact_par, "impact_vector_normed": impact_vector_normed, "b": list_b}
         
