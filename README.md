@@ -5,9 +5,9 @@ Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de V
 ## Updates!
 Here you find updates on the project!
 
-### September 2024 update: how a disk is warped by the geometry of a blackhole
+### September 2024 update: viewing a disk around a blackhole at different angles
 
-[<img src="images/disk_ani_perspectives_originalQ.gif" alt="" width="400" height="auto">]("")
+[<img src="images/disk_ani_perspectives_originalQ.gif" alt="" width="500" height="auto">]("")
 
 ### August 2024 update:
 [<img src="images/thumb_play.png" alt="" width="400" height="auto">](https://youtu.be/Sk0AeKUhAXA?si=P1IKgS9a0MaIZTv1 "Update vlog 1")
