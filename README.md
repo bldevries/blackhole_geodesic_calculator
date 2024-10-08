@@ -2,6 +2,17 @@
 
 Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de Vries</a>. PhD and Scientific visualisation advisor at <a href="https://www.surf.nl" target="_blank">SURF</a>.
 
+## Updates!
+Here you find updates on the project!
+
+### September 2024 update: how a disk is warped by the geometry of a blackhole
+
+[<img src="disk_ani_perspectives.gif" alt="" width="400" height="auto">]("")
+
+### August 2024 update:
+[<img src="images/thumb_play.png" alt="" width="400" height="auto">](https://youtu.be/Sk0AeKUhAXA?si=P1IKgS9a0MaIZTv1 "Update vlog 1")
+
+
 ## Introduction
 
 Einsteins theory of general relativity is the theory that describes gravity, blackholes and the structure of our cosmos. In this theory energy curves space-time and in turn this curvature determines how matter as well as light moves. This means that if we want to properly make an image of a blackhole in Blender, we must include curvature in our ray tracing. I made a first version of a custom render engine that implements Einstein theory. And since I am an astrophysicist, I want it to be scientifically correct. No tricks, no effects and no shortcuts. Let me show you how I am using scientific techniques to build a custom engine that renders a realistic blackhole in a Blender scene.
@@ -18,13 +29,6 @@ Einsteins theory of general relativity is the theory that describes gravity, bla
 |<img src="images/3dview_animation_moons.gif" alt="" width="500" height="auto">| 
 |:--:| 
 | *Figure 3: in Blender, the animation in Fig. 2 is nothing more then a camera (located to the lower left of the large sphere), the sphere containing conved space-time and the blackhole and some spheres moving past it. All the heavy lifting is done in the ray tracing through the curved space-time.* |
-
-## Updates!
-Here is a list of my youtube video updates on the project.
-
-### August 2024 update:
-[<img src="images/thumb_play.png" alt="" width="400" height="auto">](https://youtu.be/Sk0AeKUhAXA?si=P1IKgS9a0MaIZTv1 "Update vlog 1")
-
 
 
 ## How it works - conceptually
