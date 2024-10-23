@@ -185,28 +185,36 @@ Now we can integrate these equations (these are 8 equations since the indices ca
 
 
 ## Goals and milestones
-Ray Tracer
-* (2) Add multisampling
-* Add a disk to the blackhole
-* Allow camera to enter curved spacetime region
-* Increase sampling in the horizon region (try to make the ring of fire visible)
-* Add a metric that spans the whole scene
-* Add the ability to render objects *inside* the curved space-time region
+Ray Tracer / Physics
+* Collisions inside curved spacetime
+* Kerr Blackhole
+* Red shift
+* Polarisation
+* V Add multisampling
+* V Add a disk to the blackhole
+* V Allow camera to enter curved spacetime region
+* V Add a metric that spans the whole scene
+* V Add the ability to render objects *inside* the curved space-time region
+
+Science
+* Finish parameter study
+* Explore publication options
 
 Testing:
 * V Collect some characteristics of photon trajectories for testing
 * V Add a flat metric to the curvedpy code to compare curved and non curved scenarios precisely
-* Add a color coding option in Blender to find "rogue" rays
+* V Add a color coding option in Blender to find "rogue" rays
 
 Optimalization
-* (1) Commandline rendering
-* Run on snellius
-* Parallelization
 * Tensorflow model or interpolation of some of the calculations
+* V Commandline rendering
+* V Run on snellius
+* V Parallelization
 
 Useability:
 * Add Blender UI to the render engine
 * Finalise the python package and upload to PyPi
+	* Add tests
 * Make the render engine a proper add-on to Blender 
 
 ## Use it yourself
