@@ -7,6 +7,7 @@ Here you find updates on the project!
 
 ### October 2024: Blender Conference talk 2024
 I had a great time at the Blender Conference 2024 and enjoyed presenting my project to the people there. You can watch my talk online here:
+
 [<img src="images/thumb_play_blenderconf2024.png" alt="" width="400" height="auto">](https://youtu.be/wF8LBqV6Ayw?si=jTgnrTM-F_GB4f5J "Blender Conference 2024 talk")
 
 ### September 2024 update: viewing a disk around a black hole
