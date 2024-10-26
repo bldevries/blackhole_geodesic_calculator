@@ -47,9 +47,11 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
                 "AdobeStock_890147410_star_clusters_purple_12k_MOON.png":  {"file_name": "AdobeStock_890147410_star_clusters_purple_12k_MOON.png", "texture_name": "AdobeStock_890147410_star_clusters_purple_12k_MOON.png"},\
                 # "":  {"file_name": "", "texture_name": ""},\
                 }
+
     # TychoSkymap_t4_04096x02048: https://svs.gsfc.nasa.gov/3442
     # RandomizedSkymap.t5_16384x08192: https://svs.gsfc.nasa.gov/4451/
     # free_star_sky_hdri_spherical_map_by_kirriaa_dbw8p0w https://www.deviantart.com/kirriaa/art/Free-star-sky-HDRI-spherical-map-719281328
+    
     texture_dir ='/Users/vries001/Dropbox/0_DATA_BEN/PHYSICS/PROJECTS/blackhole_geodesic_calculator/raytracer/textures/'
 
     # ############################################################################################################################
