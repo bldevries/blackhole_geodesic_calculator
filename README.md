@@ -5,10 +5,12 @@ Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de V
 ## Updates!
 Here you find updates on the project!
 
-### October 2024: I had a great time at the Blender Conference 2024 and enjoyed presenting my project to the people there. You can watch my talk online here:
+### October 2024: Blender Conference talk 2024
+I had a great time at the Blender Conference 2024 and enjoyed presenting my project to the people there. You can watch my talk online here:
 [<img src="images/thumb_play_blenderconf2024.png" alt="" width="400" height="auto">](https://youtu.be/wF8LBqV6Ayw?si=jTgnrTM-F_GB4f5J "Blender Conference 2024 talk")
 
-### September 2024 update: viewing a disk around a blackhole at different angles
+### September 2024 update: viewing a disk around a black hole
+Viewing a disk around a blackhole at different angles
 
 [<img src="images/disk_ani_perspectives_originalQ.gif" alt="" width="500" height="auto">]("")
 
