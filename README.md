@@ -70,6 +70,9 @@ You can see even better how the lines of sight are deflected when the moon-like 
 
 
 ## How it works - code organisation
+
+Note: the numerical code is placed in a separate repository (https://github.com/bldevries/curvedpy). This will become a Python package installable using pip in future. (31 October 2024)
+
 As of now the code is in development. The idea for the general structure of the code is to have a Python package (called curvedpy) which can be installed using pip and a Blender add-on with the render engine that can be installed in Blender. The Python package does the ray tracing in curved space-time, which means solving the differential equations and any optimalizations therefor. The Blender render engine will interface with Blender and deal with the scene information and the traditional ray tracing in flat space. This code structure might change depending on how I will incorporate rendering of objects inside curved space-time. This might require less separation between the curved and flat ray tracing.
 
 ## How it works - physics & math!
