@@ -1,4 +1,4 @@
-# Tracing rays around blackholes – A render engine for curved space-times in Blender
+# Tracing rays around blackholes – A render engine for curved space-times in Blender - <img style="float: right;" src="images/surf_vis_logo.png" alt="" width="150" height="auto">
 
 Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de Vries</a>. PhD and Scientific visualisation advisor at <a href="https://www.surf.nl" target="_blank">SURF</a>.
 
