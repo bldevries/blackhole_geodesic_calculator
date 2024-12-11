@@ -5,6 +5,10 @@ Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de V
 ## Updates!
 Here you find updates on the project!
 
+### December 2024: Launch of curvedpy v0.0.1
+I have released v0.0.1 for curvedpy, the numerical back-end used to calculate photon geodesics/trajectories. You can now install it through pip. See the repo here: <a href="https://github.com/bldevries/curvedpy" target="_blank">curvedpy</a>
+
+
 ### October 2024: Blender Conference talk 2024
 I had a great time at the Blender Conference 2024 and enjoyed presenting my project to the people there. You can watch my talk online here:
 
