@@ -135,7 +135,9 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
 
         # Initiate the geodesic solver
         #self.SW = curvedpy.SchwarzschildGeodesic(metric=self.metric)
-        self.GeoInt = curvedpy.GeodesicIntegrator(metric = self.metric, mass = self.mass)
+        #self.GeoInt = curvedpy.GeodesicIntegrator(metric = self.metric, mass = self.mass)
+        self.GeoInt = curvedpy.GeodesicIntegratorSchwarzschild(mass = self.mass, time_like = False, verbose=False)
+
 
         # if self.disk_on and self.approx:
         #     print("WARNING: disk and approx are both on but do not work together. The disk is turned of.")
@@ -172,7 +174,6 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
         # Here we write the pixel values to the RenderResult
         result = self.begin_result(0, 0, self.res_x, self.res_y)#self.size_x, self.size_y)
         layer = result.layers[0].passes["Combined"]
-
 
         for y in self.ray_trace(depsgraph, self.res_x, self.res_y, 1, buf, self.samples): 
             buf.shape = -1,4  
@@ -321,15 +322,22 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
 
         #_start_conditions = [direction[0], origin[0], direction[1], origin[1], direction[2], origin[2]]
         k_x_0, x0, k_y_0, y0, k_z_0, z0 = direction[0], origin[0], direction[1], origin[1], direction[2], origin[2]
-        result = self.GeoInt.calc_trajectory(\
-                        k_x_0, x0, k_y_0, y0, k_z_0, z0,\
-                        R_end = 10000,\
-                        max_step = self.max_integration_step, verbose = False )
-
+        # result = self.GeoInt.calc_trajectory(\
+        #                 k_x_0, x0, k_y_0, y0, k_z_0, z0,\
+        #                 R_end = 10000,\
+        #                 max_step = self.max_integration_step, verbose = False )
+        
+        k0_xyz = np.array([k_x_0, k_y_0, k_z_0])
+        x0_xyz = np.array([x0, y0, z0])
+        k_xyz, x_xyz, result = self.GeoInt.calc_trajectory(k0_xyz, x0_xyz, max_step = self.max_integration_step,\
+                                                               curve_end=50, nr_points_curve=10000, verbose=False)
+        
         if result['start_inside_hole'] == False:
             hit_bh = result["hit_blackhole"]
 
-            k_x, x, k_y, y, k_z, z = result.y
+            x, y, z = x_xyz
+            k_x, k_y, k_z = k_xyz
+            #k_x, x, k_y, y, k_z, z = result.y
             curve = np.array([x, y, z])
 
             # NOW YOU DO COLLISION DETECTION
