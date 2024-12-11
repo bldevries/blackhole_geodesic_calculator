@@ -91,6 +91,12 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
         
         self.samples = bpy.data.scenes['Scene'].eevee.taa_render_samples
         
+        #self.blackhole_obj = depsgraph.scene.blackhole_obj
+        if depsgraph.scene.blackhole_obj == None:
+            self.bh_loc = mathutils.Vector([0, 0, 0])
+        else:
+            self.bh_loc = depsgraph.scene.blackhole_obj.location
+
         self.mark_y_min = depsgraph.scene.mark_y_min
         self.mark_y_max = depsgraph.scene.mark_y_max
         self.mark_x_min = depsgraph.scene.mark_x_min
@@ -119,9 +125,11 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
         #print("  - Approx. on: : ", self.approx)
         print("  - Metric: ", self.metric)
         print("  - Mass: ", self.mass)
+        print("  - BH location: ", self.bh_loc)
         print("  - Sampling seed: ", self.sampling_seed)
         print("  - Samples: ", self.samples)
         print("  - BG texture: ", self.back_ground_texture_key)
+
 
         # if self.disk_on:
         #     print("  - Disk on: ", self.disk_on)
@@ -318,7 +326,7 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
         # Direction: direction from the camera, normalized
 
         # origin: start location of the ray relative to the blackhole position
-        origin = origin - mathutils.Vector([0, 0, 0]) # We take the blackhole in the origin. Should become: blackhole_ob.location
+        origin = origin - self.bh_loc #mathutils.Vector([0, 0, 0]) # We take the blackhole in the origin. Should become: blackhole_ob.location
 
         #_start_conditions = [direction[0], origin[0], direction[1], origin[1], direction[2], origin[2]]
         k_x_0, x0, k_y_0, y0, k_z_0, z0 = direction[0], origin[0], direction[1], origin[1], direction[2], origin[2]
@@ -605,6 +613,7 @@ def get_panels():
 # #######################################################
 PROPS = [
      ('metric', bpy.props.StringProperty(name='metric', default='schwarzschild')),
+     ('blackhole_obj', bpy.props.PointerProperty(name='blackhole_obj', type=bpy.types.Object)),
      ('mass', bpy.props.FloatProperty(name='Mass', default=0.5)),
      #('ratio_obj_to_blackhole', bpy.props.FloatProperty(name='Ratio Object to Blackhole', default=30.0)),
      #('exit_tolerance', bpy.props.FloatProperty(name='Exit Tolerance', default=0.2)),
@@ -655,6 +664,7 @@ class CUSTOM_RENDER_PT_blackhole(RenderButtonsPanel, Panel):
   
         col = split.column()  
         col.row().prop(rd, "metric", text="Metric")#, expand=True)  
+        col.row().prop(rd, "blackhole_obj", text="Blackhole")#, expand=True)  
         col.row().prop(rd, "mass", text="Mass")#, expand=True)  
         #col.row().prop(rd, "ratio_obj_to_blackhole", text="Ratio Object to Blackhole")#, expand=True)  
         #col.row().prop(rd, "exit_tolerance", text="exit_tolerance")#, expand=True)  
