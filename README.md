@@ -5,6 +5,12 @@ Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de V
 ## Updates!
 Here you find updates on the project!
 
+### January 2025: Coming to NWO Physics
+Tomorrow and the day after I will be at the NWO Physics (https://nwophysics.nl/) conference. Together with colleagues from SURF we will have a booth showing what we have to offer to the scientific community. Come over, see our visualizations, chat with us to find out what we can do for your science project. 
+
+[<img src="images/ani_450-550_0.04_low_qual_2.gif" alt="" width="720" height="auto">]("")
+
+
 ### December 2024: Launch of curvedpy v0.0.1
 I have released v0.0.1 for curvedpy, the numerical back-end used to calculate photon geodesics/trajectories. You can now install it through pip. See the repo here: <a href="https://github.com/bldevries/curvedpy" target="_blank">curvedpy</a>
 

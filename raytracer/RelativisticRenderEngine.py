@@ -20,6 +20,18 @@ bl_info = {
     "category": "Render",
 }
 
+'''
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+                                                            $$$$$$$$$$ TO DO NEXT!! $$$$$$$$$$$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+- Refactor the *spacetime_hit* and *blackhole_hit* function, it still has disk things in it
+- If the camera is at x=0 (and bv y=10, z=10 and aimed at (0,0,0)) things crash. Probably the phi that goes wrong! Fix this
+
+'''
+
 ##################################################################################################################################################
 ##################################################################################################################################################
 # CLASS: RelativisticRenderEngine
@@ -88,7 +100,8 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
 
 
         #########################
-        # NEED TO GO!
+        # Dev settings
+        # MAYBE HIDE THESE FROM USER?
         #########################
         self.mark_y_min = depsgraph.scene.mark_y_min
         self.mark_y_max = depsgraph.scene.mark_y_max
@@ -104,8 +117,6 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
         if self.mark_x_max == -1: self.mark_x_max = self.res_x
         else: print("  - mark_x_max: ", self.mark_x_max)
         
-
-
         #########################
         # Print all settings
         #########################
@@ -121,7 +132,6 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
         # Initiate the geodesic solver
         #########################
         self.GeoInt = curvedpy.GeodesicIntegratorSchwarzschild(mass = self.mass, time_like = False, verbose=False)
-
 
         #########################
         # For some reason I need to update the depsgraph otherwise things wont render 
@@ -141,13 +151,11 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
     # ############################################################################################################################
     def render_scene(self, depsgraph):
     # ############################################################################################################################
-
-        #width, height = self.res_x, self.res_y
         buf = np.ones(self.res_x*self.res_y*4)
         buf.shape = self.res_y,self.res_x,4
 
         # Here we write the pixel values to the RenderResult
-        result = self.begin_result(0, 0, self.res_x, self.res_y)#self.size_x, self.size_y)
+        result = self.begin_result(0, 0, self.res_x, self.res_y)
         layer = result.layers[0].passes["Combined"]
 
         for y in self.ray_trace(depsgraph, self.res_x, self.res_y, 1, buf, self.samples): 
@@ -278,6 +286,10 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
         
         k0_xyz = np.array([k_x_0, k_y_0, k_z_0])
         x0_xyz = np.array([x0, y0, z0])
+        converter = curvedpy.Conversions()
+        print("x0_xyz", x0_xyz, k0_xyz)
+        print(converter.convert_xyz_to_sph(x0_xyz, k0_xyz))
+
         k_xyz, x_xyz, result = self.GeoInt.calc_trajectory(k0_xyz, x0_xyz, max_step = self.max_integration_step,\
                                                                curve_end=self.int_depth_curve_end, nr_points_curve=10000, verbose=False)
         
