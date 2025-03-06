@@ -10,7 +10,7 @@ Its been a few months and I thought it would be nice to update on the render eng
 
 For the people with a keen eye, besides the main and second image you can see also just so faintly a third image (only a few pixels on the same side of the black hole as the primary image). Also when the star is just in front of the black hole you can see the photon ring faintly around the black hole. It comes from photons emitted at the back side of the star which make one or more orbits around the black hole and then reach the camera.
 
-[<img src="images/rotating_star_March2025.gif" alt="" width="720" height="auto">]("")
+[<img src="images/rotating_star_March2025_crop.gif" alt="" width="720" height="auto">]("")
 
 (1) Credits for the texture go to the Solar System Scope project and NASA (https://www.solarsystemscope.com/textures/)
 
