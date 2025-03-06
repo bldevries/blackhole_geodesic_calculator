@@ -5,6 +5,12 @@ Author: <a href="https://www.linkedin.com/in/bldevries/" target="_blank">BL de V
 ## Updates!
 Here you find updates on the project!
 
+### March 2025: an update on the render engine
+Its been a few months and I thought it would be nice to update on the render engine with a new image. This is a 1024x1024 animation of a basic sphere with a texture, orbiting a Schwarzschild blackhole. You can see it move inbetween the you and the black hole and then moving behind the black hole, forming an Einstein ring around the hole when it is just behind it. The animation has 100 frames and the renders have a multisampling of 5. Not much, but computations are still very heavy. I am moving closer to a first working version of the Black Hole Render Engine, so stay tuned.
+
+[<img src="images/rotating_star_March2025.gif" alt="" width="720" height="auto">]("")
+
+
 ### January 2025: Coming to NWO Physics
 Tomorrow and the day after I will be at the NWO Physics (https://nwophysics.nl/) conference. Together with colleagues from SURF we will have a booth showing what we have to offer to the scientific community. Come over, see our visualizations, chat with us to find out what we can do for your science project. 
 
