@@ -8,7 +8,7 @@ import curvedpy
 import os
 import time
 import random
-from curvedpy.generate_data_sets.camera import RelativisticCamera
+from curvedpy.cameras.camera import RelativisticCamera
 #reload(curvedpy)
 
 from bpy.types import Panel  
@@ -428,13 +428,19 @@ class RelativisticRenderEngine(bpy.types.RenderEngine):
     
         color = np.zeros(3)  
         if self.sky_tex_name in bpy.data.textures:
+
+
             if direction[2] > 1 or direction[2]<-1:
+            #if len_dir_vector != 1.0:
+                # !!!!This should not be done here, curvedpy needs to give normed vectors
                 print("Wrong, dir not normalized: ", direction)
+                direction = direction / np.linalg.norm(direction)
+
             theta = 1-np.arccos(direction[2])/np.pi
             phi = np.arctan2(direction[1], direction[0])/np.pi
             color = np.array(bpy.data.textures[self.sky_tex_name].evaluate( (-phi,2*theta-1,0) ).xyz )
         else:
-            color = np.array([0,0,0])
+            color = np.array([1,0,0])#np.array([0,0,0])
         return color
 
     # ############################################################################################################################
